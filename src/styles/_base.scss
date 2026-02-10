@@ -1,0 +1,233 @@
+/* =========================================
+   SYSC -- Base Styles
+   Reset, tokens, utilities, layout
+   ========================================= */
+
+
+/* =========================================
+   1. CSS RESET / NORMALIZE
+   ========================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  background: #06080d;
+  color: #eaf6ff;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  overflow: hidden; /* app layout like OS */
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.45),
+    0 0 0 6px rgba(207,233,255,.2);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+
+
+/* =========================================
+   2. DESIGN TOKENS (GLOBAL VARIABLES)
+   ========================================= */
+
+:root {
+  /* Colors */
+  --bg: #06080d;
+  --bg-soft: #0d1118;
+
+  --text: #eaf6ff;
+  --text-muted: #8ea3b7;
+
+  --accent: #7afcff;
+  --accent-strong: #3ec7ff;
+
+  /* Glass */
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.1);
+  --border-soft: rgba(255, 255, 255, 0.08);
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+
+  /* Shadows */
+  --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.5);
+  --glow: 0 0 24px rgba(122, 252, 255, 0.25);
+
+  /* Blur */
+  --blur-lg: 22px;
+}
+
+
+
+/* =========================================
+   3. GLOBAL UTILITIES
+   (Reusable everywhere)
+   ========================================= */
+
+/* ---------- Glass panel ---------- */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur-lg));
+  border: 1px solid var(--border-soft);
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+/* ---------- Buttons ---------- */
+
+.primary-button {
+  padding: 12px 26px;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    var(--accent-strong)
+  );
+
+  color: #051015;
+  font-weight: 600;
+
+  box-shadow: var(--glow);
+
+  transition: 0.2s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+}
+
+.ghost-button {
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+
+  color: var(--text-muted);
+
+  transition: 0.2s ease;
+}
+
+.ghost-button:hover {
+  background: var(--glass);
+  color: var(--text);
+}
+
+/* ---------- Icon button ---------- */
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  transition: 0.2s ease;
+}
+
+.icon-button:hover {
+  background: var(--glass);
+}
+
+
+
+/* =========================================
+   4. LAYOUT HELPERS
+   ========================================= */
+
+.app {
+  height: 100%;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.24) transparent;
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  .page {
+    scroll-behavior: auto;
+  }
+}
+
+
+
+

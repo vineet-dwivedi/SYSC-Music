@@ -1,0 +1,286 @@
+.track-row {
+  position: relative;
+
+  display: grid;
+  grid-template-columns: 1.6fr 1fr auto;
+  align-items: center;
+  gap: 22px;
+
+  padding: 12px 18px;
+
+  border-radius: 16px;
+
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+
+  transition:
+    transform .25s cubic-bezier(.22,1,.36,1),
+    background .25s ease,
+    box-shadow .25s ease;
+
+  overflow: hidden;
+}
+
+.track-row.is-active {
+  background: rgba(255,255,255,.14);
+  border-color: rgba(207,233,255,.35);
+  box-shadow: 0 16px 30px rgba(0,0,0,.4);
+}
+
+.track-row.is-active .track-row__play {
+  opacity: 1;
+  transform: scale(1);
+  background: linear-gradient(
+    135deg,
+    #cfe9ff,
+    #e6ddff,
+    #ffd6e7
+  );
+  color: #0b0c10;
+}
+
+
+/* subtle pastel wash */
+
+.track-row::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+
+  background:
+    radial-gradient(circle at 10% 50%, #cfe9ff 0%, transparent 55%),
+    radial-gradient(circle at 90% 50%, #ffd6e7 0%, transparent 55%);
+
+  opacity: 0;
+  transition: opacity .35s ease;
+
+  pointer-events: none;
+}
+
+
+@media (hover:hover) {
+  .track-row:hover {
+    background: rgba(255,255,255,.10);
+    transform: translateY(-2px);
+
+    box-shadow:
+      0 10px 26px rgba(0,0,0,.35);
+  }
+
+  .track-row:hover::before {
+    opacity: .35;
+  }
+
+  .track-row:hover .track-row__play {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* =========================
+   LEFT AREA
+========================= */
+
+.track-row__title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.track-row__art {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+}
+
+.track-row__name {
+  font-size: .92rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-row__artist {
+  font-size: .78rem;
+  color: rgba(255,255,255,.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================
+   PLAY BUTTON
+========================= */
+
+.track-row__play {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.18);
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(255,255,255,.08);
+
+  cursor: pointer;
+
+  backdrop-filter: blur(10px);
+
+  opacity: 0;
+  transform: scale(.85);
+
+  transition:
+    opacity .25s ease,
+    transform .25s cubic-bezier(.22,1,.36,1),
+    background .25s ease;
+}
+
+.track-row__play:hover {
+  background: linear-gradient(
+    135deg,
+    #cfe9ff,
+    #e6ddff,
+    #ffd6e7
+  );
+
+  color: #0b0c10;
+  transform: scale(1.05);
+}
+
+.track-row__play:active {
+  transform: scale(.92);
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+.track-row__progress {
+  width: 100%;
+}
+
+.track-row .progress {
+  position: relative;
+  width: 100%;
+  height: 5px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.12);
+  overflow: hidden;
+}
+
+.track-row .progress__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  border-radius: 999px;
+
+  background: linear-gradient(
+    90deg,
+    #cfe9ff,
+    #e6ddff,
+    #ffd6e7
+  );
+
+  box-shadow: 0 0 14px rgba(207,233,255,.45);
+  transition: width .2s linear;
+}
+
+
+/* =========================
+   TIME
+========================= */
+
+.track-row__time {
+  font-size: .78rem;
+  color: rgba(255,255,255,.55);
+  letter-spacing: .02em;
+}
+
+
+/* =========================
+   TAP FEEDBACK
+========================= */
+
+.track-row:active {
+  transform: scale(.98);
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .track-row {
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+  }
+
+  .track-row__progress {
+    display: none;
+  }
+
+  .track-row__play {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .track-row {
+    padding: 10px 14px;
+    border-radius: 14px;
+  }
+
+  .track-row__art {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .track-row__name {
+    font-size: .86rem;
+  }
+
+  .track-row__artist {
+    font-size: .72rem;
+  }
+
+  .track-row__play {
+    width: 32px;
+    height: 32px;
+  }
+
+  .track-row__time {
+    font-size: .72rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .track-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .track-row__time {
+    display: none;
+  }
+}

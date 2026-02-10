@@ -1,0 +1,205 @@
+.album-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  padding: 16px;
+
+  border-radius: 22px;
+
+  cursor: pointer;
+  overflow: hidden;
+
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,.14),
+    rgba(255,255,255,.05)
+  );
+
+  border: 1px solid rgba(255,255,255,.18);
+
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.35);
+
+  transition:
+    transform .45s cubic-bezier(.22,1,.36,1),
+    box-shadow .35s ease,
+    background .35s ease;
+}
+
+.album-card.is-active {
+  border-color: rgba(207,233,255,.45);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.55),
+    0 0 24px rgba(207,233,255,.35);
+}
+
+.album-card__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #0b0c10;
+  background: linear-gradient(120deg,#cfe9ff,#e6ddff,#ffd6e7);
+  box-shadow: 0 8px 18px rgba(0,0,0,.35);
+  z-index: 2;
+}
+
+.album-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+
+  background:
+    radial-gradient(circle at 20% 20%, #cfe9ff 0%, transparent 55%),
+    radial-gradient(circle at 80% 80%, #ffd6e7 0%, transparent 55%),
+    radial-gradient(circle at 60% 10%, #e6ddff 0%, transparent 55%);
+
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none;
+}
+
+@media (hover:hover) {
+
+  .album-card:hover {
+    transform: translateY(-10px) scale(1.03);
+
+    box-shadow:
+      0 30px 70px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.45);
+  }
+
+  .album-card:hover::before {
+    opacity: .35;
+  }
+
+  .album-card:hover .album-card__action {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .album-card:hover .art {
+    transform: scale(1.06);
+  }
+}
+
+.album-card .art {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+
+  border-radius: 18px;
+
+  background-size: cover;
+  background-position: center;
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.6);
+
+  transition:
+    transform .6s cubic-bezier(.22,1,.36,1);
+}
+
+.album-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px 2px 6px;
+}
+
+.album-card__meta h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+
+.album-card__meta p {
+  font-size: .82rem;
+  color: rgba(255,255,255,.6);
+}
+
+.album-card__action {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+  border: none;
+
+  display: grid;
+  place-items: center;
+
+  background: linear-gradient(
+    135deg,
+    #cfe9ff,
+    #e6ddff,
+    #ffd6e7
+  );
+
+  color: #0b0c10;
+
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.5);
+
+  cursor: pointer;
+
+  opacity: 0;
+  transform: translateY(10px) scale(.9);
+
+  transition:
+    opacity .35s ease,
+    transform .35s cubic-bezier(.22,1,.36,1);
+}
+
+.album-card:active {
+  transform: scale(.98);
+}
+
+@media (max-width: 1100px) {
+  .album-card {
+    border-radius: 20px;
+    padding: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .album-card {
+    padding: 12px;
+  }
+  .album-card__meta h3 {
+    font-size: .92rem;
+  }
+  .album-card__action {
+    opacity: 1;
+    transform: none;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .album-card {
+    gap: 10px;
+    border-radius: 18px;
+  }
+  .album-card__meta p {
+    font-size: .78rem;
+  }
+  .album-card__action {
+    width: 36px;
+    height: 36px;
+  }
+}

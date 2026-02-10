@@ -1,0 +1,62 @@
+.volume-hud {
+  position: fixed;
+  left: 50%;
+  bottom: 118px;
+  transform: translateX(-50%) translateY(12px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  backdrop-filter: blur(16px) saturate(170%);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity .25s ease,
+    transform .25s ease;
+  z-index: 1900;
+}
+
+.volume-hud.is-active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.volume-hud__bar {
+  width: 120px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.2);
+  overflow: hidden;
+}
+
+.volume-hud__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#cfe9ff,#e6ddff,#ffd6e7);
+  box-shadow: 0 0 12px rgba(207,233,255,.45);
+  transition: width .15s linear;
+}
+
+.volume-hud__value {
+  font-size: .72rem;
+  color: rgba(255,255,255,.7);
+  min-width: 34px;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .volume-hud {
+    bottom: 100px;
+  }
+
+  .volume-hud__bar {
+    width: 90px;
+  }
+}

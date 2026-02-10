@@ -1,0 +1,341 @@
+.sidebar {
+  position: relative;
+
+  width: min(1200px, 94vw);
+  height: auto;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+
+  padding: 12px 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.14),
+      rgba(255,255,255,.05)
+    );
+
+  border: 1px solid rgba(255,255,255,.16);
+
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.25),
+    0 20px 50px rgba(0,0,0,.55);
+
+  transition:
+    width .45s cubic-bezier(.22,1,.36,1),
+    transform .45s cubic-bezier(.22,1,.36,1);
+
+  overflow: hidden;
+  z-index: 100;
+}
+
+.page-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding: 24px 16px 120px;
+}
+
+
+
+/* ======================
+   COLLAPSED
+====================== */
+
+.sidebar.is-collapsed {
+  width: min(720px, 92vw);
+}
+
+.sidebar.is-collapsed .sidebar__text,
+.sidebar.is-collapsed .sidebar__label {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-6px);
+}
+
+
+
+/* ======================
+   HEADER
+====================== */
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 100%;
+}
+
+
+
+/* mac style traffic lights */
+
+.mac-controls {
+  display: flex;
+  gap: 6px;
+  margin-right: 6px;
+}
+
+.mac-controls span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.mac-controls span:nth-child(1) { background: #ff5f57; }
+.mac-controls span:nth-child(2) { background: #ffbd2e; }
+.mac-controls span:nth-child(3) { background: #28c840; }
+
+
+
+/* ======================
+   TOGGLE
+====================== */
+
+.sidebar__toggle {
+  margin-left: auto;
+}
+
+
+
+/* ======================
+   SECTIONS
+====================== */
+
+.sidebar__section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 260px;
+}
+
+.sidebar__label {
+  font-size: .7rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+  padding: 0 8px;
+
+  transition: opacity .3s, transform .3s;
+}
+
+
+
+/* ======================
+   NAV ITEMS
+====================== */
+
+.sidebar__nav,
+.sidebar__playlists {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.sidebar__nav::-webkit-scrollbar,
+.sidebar__playlists::-webkit-scrollbar {
+  height: 6px;
+}
+
+.sidebar__nav::-webkit-scrollbar-thumb,
+.sidebar__playlists::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.18);
+  border-radius: 999px;
+}
+
+
+.sidebar__item,
+.sidebar__playlist {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  height: 38px;
+  padding: 0 14px;
+
+  border-radius: 999px;
+  border: 1px solid transparent;
+
+  background: rgba(255,255,255,.04);
+
+  color: rgba(255,255,255,.75);
+  font-size: .88rem;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(10px);
+
+  transition:
+    background .25s ease,
+    transform .2s ease,
+    border .25s ease,
+    color .25s ease;
+}
+
+
+
+.sidebar__item .icon,
+.sidebar__playlist .dot {
+  flex-shrink: 0;
+}
+
+
+
+/* subtle pastel glow */
+
+.sidebar__item::before,
+.sidebar__playlist::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(207,233,255,.35),
+      rgba(230,221,255,.25),
+      rgba(255,214,231,.35)
+    );
+
+  opacity: 0;
+  transition: opacity .25s;
+  pointer-events: none;
+}
+
+
+
+@media (hover:hover) {
+  .sidebar__item:hover,
+  .sidebar__playlist:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,.10);
+  }
+
+  .sidebar__item:hover::before,
+  .sidebar__playlist:hover::before {
+    opacity: .4;
+  }
+}
+
+
+
+/* active */
+
+.sidebar__item.is-active {
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff;
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.35);
+}
+
+.sidebar__playlist.is-active {
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff;
+
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.35);
+}
+
+
+
+/* muted */
+
+.sidebar__item.muted {
+  opacity: .6;
+}
+
+
+
+/* ======================
+   PLAYLIST DOT
+====================== */
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg,#cfe9ff,#e6ddff,#ffd6e7);
+}
+
+
+
+/* ======================
+   TEXT
+====================== */
+
+.sidebar__text {
+  white-space: nowrap;
+  transition: opacity .3s, transform .3s;
+}
+
+
+
+/* ======================
+   SETTINGS BUTTON
+====================== */
+
+.sidebar__settings {
+  margin-left: auto;
+}
+
+
+
+/* ======================
+   RESPONSIVE
+====================== */
+
+@media (max-width: 1100px) {
+  .sidebar {
+    width: min(980px, 94vw);
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    gap: 10px 14px;
+    padding: 12px 14px;
+  }
+
+  .sidebar__section {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    padding: 16px 12px;
+  }
+
+  .sidebar__item,
+  .sidebar__playlist {
+    height: 44px;
+    font-size: .9rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .sidebar__label {
+    display: none;
+  }
+
+  .sidebar__item,
+  .sidebar__playlist {
+    padding: 0 12px;
+  }
+}

@@ -1,0 +1,146 @@
+.app__background {
+  position: fixed;
+  inset: 0;
+
+  overflow: hidden;
+  z-index: -1;
+
+  background:
+    radial-gradient(circle at 15% 20%, #0f1117 0%, #0a0b10 40%, #07080c 100%);
+
+  pointer-events: none;
+}
+
+
+
+.noise {
+  position: absolute;
+  inset: -50%;
+
+  opacity: .035;
+  mix-blend-mode: overlay;
+
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.08) 0px,
+      rgba(255,255,255,.08) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+
+  animation: noiseShift 0.3s steps(2) infinite;
+}
+
+@keyframes noiseShift {
+  0% { transform: translate(0,0); }
+  100% { transform: translate(-2px,2px); }
+}
+
+.orb {
+  position: absolute;
+
+  width: 60vw;
+  height: 60vw;
+
+  border-radius: 50%;
+
+  filter: blur(140px);
+  opacity: .65;
+
+  animation: floatOrb 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+
+.orb--one {
+  top: -10%;
+  left: -15%;
+
+  background:
+    radial-gradient(circle,
+      rgba(207,233,255,.95) 0%,
+      rgba(207,233,255,.55) 40%,
+      transparent 70%
+    );
+}
+
+.orb--two {
+  bottom: -15%;
+  right: -10%;
+
+  background:
+    radial-gradient(circle,
+      rgba(230,221,255,.95) 0%,
+      rgba(230,221,255,.55) 40%,
+      transparent 70%
+    );
+
+  animation-duration: 28s;
+}
+
+.orb--three {
+  top: 40%;
+  left: 45%;
+
+  background:
+    radial-gradient(circle,
+      rgba(255,214,231,.95) 0%,
+      rgba(255,214,231,.55) 40%,
+      transparent 70%
+    );
+
+  animation-duration: 26s;
+}
+
+
+@keyframes floatOrb {
+  0% {
+    transform: translate3d(0,0,0) scale(1);
+  }
+  50% {
+    transform: translate3d(30px,-40px,0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-20px,30px,0) scale(1.02);
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .orb {
+    width: 80vw;
+    height: 80vw;
+    filter: blur(120px);
+  }
+}
+
+@media (max-width: 768px) {
+  .orb {
+    width: 110vw;
+    height: 110vw;
+    filter: blur(110px);
+    opacity: .55;
+  }
+}
+
+@media (max-width: 480px) {
+  .orb {
+    animation-duration: 40s;
+    opacity: .45;
+  }
+
+  .noise {
+    opacity: .025;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    animation: none;
+  }
+
+  .noise {
+    animation: none;
+  }
+}

@@ -1,0 +1,102 @@
+.delete-playlist-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1350;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s cubic-bezier(.22,1,.36,1);
+}
+
+.delete-playlist-overlay .overlay__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 60% at 20% 30%, rgba(255,170,190,.28) 0%, transparent 60%),
+    radial-gradient(70% 60% at 80% 70%, rgba(255,120,160,.22) 0%, transparent 60%),
+    rgba(10,10,14,.82);
+  backdrop-filter: blur(42px) saturate(140%);
+  -webkit-backdrop-filter: blur(42px) saturate(140%);
+}
+
+.delete-playlist-panel {
+  position: relative;
+  width: min(520px, 92vw);
+  padding: 28px;
+  border-radius: 26px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,.14),
+    rgba(255,255,255,.05)
+  );
+
+  border: 1px solid rgba(255,255,255,.18);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+
+  box-shadow:
+    0 40px 90px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.35);
+
+  transform: translateY(32px) scale(.96);
+  opacity: 0;
+  transition:
+    transform .6s cubic-bezier(.22,1,.36,1),
+    opacity .6s cubic-bezier(.22,1,.36,1);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.delete-playlist-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.delete-playlist-overlay.is-active .delete-playlist-panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.delete-playlist__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.delete-playlist__header h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.delete-playlist__copy {
+  color: rgba(255,255,255,.7);
+  line-height: 1.6;
+}
+
+.delete-playlist__copy strong {
+  color: rgba(255,255,255,.95);
+}
+
+.delete-playlist__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .delete-playlist-panel {
+    padding: 20px;
+    width: 96vw;
+  }
+
+  .delete-playlist__actions {
+    flex-direction: column;
+  }
+
+  .delete-playlist__actions .ghost-button {
+    width: 100%;
+  }
+}
