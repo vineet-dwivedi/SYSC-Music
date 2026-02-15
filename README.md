@@ -1,4 +1,4 @@
-# 🎵 Music Streaming App (Full Stack)
+# 🎵 Music Streaming App (Full Stack) Tommorow i'll upload the final draft of this project
 
 A high-performance full-stack music streaming platform built using:
 
