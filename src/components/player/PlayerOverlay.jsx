@@ -2,6 +2,7 @@ function PlayerOverlay({
   isOpen,
   onClose,
   track,
+  trackImage,
   isPlaying,
   onPlayToggle,
   onNext,
@@ -15,6 +16,8 @@ function PlayerOverlay({
   volumePercent,
   onVolumeChange,
 }) {
+  const artStyle = trackImage ? { backgroundImage: `url(${trackImage})` } : undefined
+
   return (
     <div
       className={`overlay player-overlay ${isOpen ? 'is-active' : ''}`}
@@ -26,7 +29,7 @@ function PlayerOverlay({
           <span className="icon icon--close" />
         </button>
         <div className="full-player__art">
-          <div className="art art--full" />
+          <div className="art--full" style={artStyle} />
           <div className="parallax-sheen" />
         </div>
         <div className="full-player__meta">

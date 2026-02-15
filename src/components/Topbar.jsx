@@ -6,7 +6,7 @@ function Topbar({ onSearchOpen, onNavigate, onProfileOpen, profile }) {
     <header className="topbar">
       <button className="topbar__search" type="button" onClick={onSearchOpen}>
         <span className="icon icon--search" />
-        <span>Search albums, artists, playlists</span>
+        <span>Search songs</span>
       </button>
       <div className="topbar__actions">
         <button className="ghost-button" type="button" onClick={() => onNavigate('library')}>

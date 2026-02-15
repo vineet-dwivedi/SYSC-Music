@@ -89,19 +89,23 @@
     transform: translateY(0) scale(1);
   }
 
-  .album-card:hover .art {
+  .album-card:hover .art,
+  .album-card:hover .album-card__cover {
     transform: scale(1.06);
   }
 }
 
+.album-card__cover,
 .album-card .art {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: clamp(100px, 28vw, 160px);
 
   border-radius: 18px;
 
   background-size: cover;
   background-position: center;
+  object-fit: cover;
+  object-position: center;
 
   box-shadow:
     0 18px 40px rgba(0,0,0,.6);
@@ -179,6 +183,10 @@
   .album-card {
     padding: 12px;
   }
+  .album-card__cover,
+  .album-card .art {
+    height: 132px;
+  }
   .album-card__meta h3 {
     font-size: .92rem;
   }
@@ -194,6 +202,10 @@
   .album-card {
     gap: 10px;
     border-radius: 18px;
+  }
+  .album-card__cover,
+  .album-card .art {
+    height: 118px;
   }
   .album-card__meta p {
     font-size: .78rem;

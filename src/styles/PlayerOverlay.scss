@@ -106,11 +106,13 @@
   grid-row: span 4;
   display: grid;
   place-items: center;
+  align-self: stretch;
 }
 
 .art--full {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: clamp(320px, 58vh, 560px);
+  max-width: 420px;
   border-radius: 32px;
 
   background-size: cover;
@@ -295,6 +297,11 @@
     margin-inline: auto;
   }
 
+  .art--full {
+    height: clamp(260px, 46vh, 420px);
+    max-width: 340px;
+  }
+
   .full-player__controls {
     justify-content: center;
   }
@@ -319,6 +326,12 @@
   .icon-button.is-primary {
     width: 52px;
     height: 52px;
+  }
+
+  .art--full {
+    height: clamp(220px, 38vh, 320px);
+    max-width: 280px;
+    border-radius: 22px;
   }
 
   .volume {

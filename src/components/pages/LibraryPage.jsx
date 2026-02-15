@@ -12,6 +12,7 @@ function LibraryPage({
   onToggleFilter,
   savedAlbums,
   onPlayAlbum,
+  onOpenAlbum,
   scrollTarget,
   onClearScrollTarget,
   activeAlbum,
@@ -84,6 +85,7 @@ function LibraryPage({
                 key={album.title}
                 album={album}
                 onPlay={() => onPlayAlbum(album, tracks)}
+                onOpen={() => onOpenAlbum(album)}
                 isSaved={savedAlbums.has(album.title)}
                 isActive={activeAlbum === album.title}
               />

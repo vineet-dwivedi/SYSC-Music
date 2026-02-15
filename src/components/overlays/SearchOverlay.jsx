@@ -13,7 +13,7 @@ function SearchOverlay({ isOpen, onClose, results, query, onQueryChange, onOpenR
           <span className="icon icon--search" />
           <input
             type="text"
-            placeholder="Albums, playlists, artists"
+            placeholder="Search songs by name"
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
           />
@@ -22,7 +22,7 @@ function SearchOverlay({ isOpen, onClose, results, query, onQueryChange, onOpenR
           {results.length ? (
             results.map((result) => (
               <div
-                key={result.title}
+                key={result.id}
                 className="search-result"
                 role="button"
                 tabIndex={0}
@@ -34,7 +34,16 @@ function SearchOverlay({ isOpen, onClose, results, query, onQueryChange, onOpenR
                   }
                 }}
               >
-                <div className={`art ${result.art}`} />
+                {result.coverImage ? (
+                  <img
+                    className="art search-result__art-image"
+                    src={result.coverImage}
+                    alt={`${result.title} cover`}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="art search-result__art-fallback" />
+                )}
                 <div>
                   <p className="search-result__title">{result.title}</p>
                   <p className="search-result__meta">{result.meta}</p>
@@ -47,12 +56,12 @@ function SearchOverlay({ isOpen, onClose, results, query, onQueryChange, onOpenR
                     onOpenResult(result)
                   }}
                 >
-                  Open
+                  Play
                 </button>
               </div>
             ))
           ) : (
-            <div className="search-panel__empty">No matches yet. Try another keyword.</div>
+            <div className="search-panel__empty">Type a song name to search.</div>
           )}
         </div>
       </div>

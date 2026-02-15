@@ -211,6 +211,14 @@ background-position: center;
 box-shadow: 0 6px 18px rgba(0,0,0,.5);
 }
 
+.search-result__art-image {
+  object-fit: cover;
+}
+
+.search-result__art-fallback {
+  background: linear-gradient(120deg,#cfe9ff,#e6ddff,#ffd6e7);
+}
+
 .search-result__title {
 color: var(--text-primary);
 font-weight: 500;

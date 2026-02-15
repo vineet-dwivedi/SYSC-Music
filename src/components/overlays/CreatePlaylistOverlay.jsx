@@ -1,5 +1,15 @@
-function CreatePlaylistOverlay({ isOpen, name, onNameChange, onClose, onCreate }) {
+function CreatePlaylistOverlay({
+  isOpen,
+  name,
+  tracks = [],
+  selectedTrackIds = [],
+  onNameChange,
+  onToggleTrack,
+  onClose,
+  onCreate,
+}) {
   const safeName = name ?? ''
+  const selectedSet = new Set(selectedTrackIds)
   const isDisabled = !safeName.trim()
   return (
     <div className={`overlay create-playlist-overlay ${isOpen ? 'is-active' : ''}`} inert={!isOpen}>
@@ -32,6 +42,29 @@ function CreatePlaylistOverlay({ isOpen, name, onNameChange, onClose, onCreate }
             }}
           />
         </label>
+        <div className="create-playlist__tracks">
+          <p className="create-playlist__tracks-label">
+            Select songs ({selectedTrackIds.length})
+          </p>
+          <div className="create-playlist__tracks-list">
+            {tracks.map((track, index) => {
+              const trackId = track.id ?? track._id ?? null
+              const trackKey = trackId ?? `${track.title}-${track.artist}-${index}`
+              const isChecked = trackId ? selectedSet.has(trackId) : false
+              return (
+                <label key={trackKey} className="create-playlist__track-item">
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    disabled={!trackId}
+                    onChange={() => onToggleTrack?.(trackId)}
+                  />
+                  <span>{track.title} - {track.artist}</span>
+                </label>
+              )
+            })}
+          </div>
+        </div>
         <div className="create-playlist__actions">
           <button className="ghost-button" type="button" onClick={onClose}>
             Cancel

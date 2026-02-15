@@ -104,6 +104,39 @@
   gap: 12px;
 }
 
+.create-playlist__tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.create-playlist__tracks-label {
+  font-size: .8rem;
+  color: rgba(255,255,255,.6);
+}
+
+.create-playlist__tracks-list {
+  max-height: 220px;
+  overflow: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  padding: 8px;
+}
+
+.create-playlist__track-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  font-size: .84rem;
+  color: rgba(255,255,255,.82);
+}
+
+.create-playlist__track-item + .create-playlist__track-item {
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
 .create-playlist__actions .primary-button:disabled {
   opacity: .5;
   cursor: not-allowed;

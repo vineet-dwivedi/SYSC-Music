@@ -57,18 +57,26 @@ function Sidebar({
       <div className="sidebar__section">
         <p className="sidebar__label">Playlists</p>
         <div className="sidebar__playlists">
-          {playlists.map((playlist) => (
-            <button
-              key={playlist}
-              className={`sidebar__playlist ${activePlaylist === playlist ? 'is-active' : ''}`}
-              type="button"
-              onClick={() => onSelectPlaylist(playlist)}
-              aria-pressed={activePlaylist === playlist}
-            >
-              <span className="dot" />
-              <span className="sidebar__text">{playlist}</span>
-            </button>
-          ))}
+          {playlists.length ? (
+            playlists.map((playlist) => {
+              const playlistName = typeof playlist === 'string' ? playlist : playlist.name
+              const playlistId = typeof playlist === 'string' ? playlist : playlist.id
+              return (
+                <button
+                  key={playlistId}
+                  className={`sidebar__playlist ${activePlaylist === playlistName ? 'is-active' : ''}`}
+                  type="button"
+                  onClick={() => onSelectPlaylist(playlistName)}
+                  aria-pressed={activePlaylist === playlistName}
+                >
+                  <span className="dot" />
+                  <span className="sidebar__text">{playlistName}</span>
+                </button>
+              )
+            })
+          ) : (
+            <span className="sidebar__empty">No playlists yet</span>
+          )}
         </div>
       </div>
 

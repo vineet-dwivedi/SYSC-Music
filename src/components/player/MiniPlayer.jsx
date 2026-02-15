@@ -2,6 +2,7 @@ function MiniPlayer({
   isHidden,
   onExpand,
   track,
+  trackImage,
   isPlaying,
   onPlayToggle,
   onNext,
@@ -11,9 +12,11 @@ function MiniPlayer({
   volumePercent,
   onVolumeChange,
 }) {
+  const artStyle = trackImage ? { backgroundImage: `url(${trackImage})` } : undefined
+
   return (
     <div className={`mini-player ${isHidden ? 'is-hidden' : ''}`}>
-      <div className="mini-player__art art art--mini" />
+      <div className="mini-player__art" style={artStyle} />
       <div className="mini-player__meta">
         <p className="mini-player__title">{track?.title ?? 'Select a track'}</p>
         <p className="mini-player__artist">{track?.artist ?? '-'}</p>

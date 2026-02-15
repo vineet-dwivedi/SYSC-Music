@@ -37,6 +37,13 @@ const songSchema = new mongoose.Schema(
       index: true
     },
 
+    playlistId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Playlist",
+      default: null,
+      index: true
+    },
+
     plays: {
       type: Number,
       default: 0

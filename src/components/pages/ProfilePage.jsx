@@ -1,7 +1,6 @@
 function ProfilePage({
   footer,
   user,
-  stats,
   featuredAlbum,
   onEditProfile,
   onOpenSettings,
@@ -24,21 +23,6 @@ function ProfilePage({
               Preferences
             </button>
           </div>
-        </div>
-      </div>
-
-      <div className="profile-stats">
-        <div className="profile-stat glass-panel">
-          <p className="profile-stat__value">{stats.savedAlbums}</p>
-          <p className="profile-stat__label">Saved albums</p>
-        </div>
-        <div className="profile-stat glass-panel">
-          <p className="profile-stat__value">{stats.playlists}</p>
-          <p className="profile-stat__label">Playlists</p>
-        </div>
-        <div className="profile-stat glass-panel">
-          <p className="profile-stat__value">{stats.hours}</p>
-          <p className="profile-stat__label">Hours listened</p>
         </div>
       </div>
 

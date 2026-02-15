@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
-import AppBackground from '../AppBackground.jsx'
 
 function IntroScreen({ onEnter }) {
   const rootRef = useRef(null)
@@ -195,12 +194,16 @@ function IntroScreen({ onEnter }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 0.61, 0.36, 1] }}
     >
-      <AppBackground />
       <div className="intro__glow" />
+      <div className="intro__nebula" />
       <div className="intro__grid" />
       <div className="intro__speed" />
       <div className="intro__lines">
         <span />
+        <span />
+        <span />
+      </div>
+      <div className="intro__core" aria-hidden="true">
         <span />
         <span />
       </div>
@@ -231,7 +234,7 @@ function IntroScreen({ onEnter }) {
       <div className="intro__content">
         <div className="intro__badge">SYSC</div>
         <div className="intro__signature">Systemic Sound Collective</div>
-        <h1 className="intro__title">SYSC</h1>
+        <h1 className="intro__title" data-text="SYSC">SYSC</h1>
         <p className="intro__subtitle">Cinematic Sound Suite</p>
 
         <div className="intro__card" ref={cardRef}>
@@ -242,7 +245,7 @@ function IntroScreen({ onEnter }) {
           </div>
           <div className="intro__card-inner">
             <div className="intro__card-label">Now Curated</div>
-            <div className="intro__card-title">Midnight Drive</div>
+            <div className="intro__card-title">Yours Truly</div>
             <div className="intro__card-meta">Lossless - Focus Sessions</div>
             <div className="intro__card-progress">
               <div className="progress progress--full">

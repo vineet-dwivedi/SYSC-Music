@@ -1,0 +1,280 @@
+/* =========================================
+   SYSC -- Sterling Monochrome Theme (UI only)
+   ========================================= */
+
+:root {
+  --ultra-bg-0: #050607;
+  --ultra-bg-1: #0d1015;
+  --ultra-bg-2: #151a22;
+
+  --ultra-glass: rgba(24, 28, 36, 0.66);
+  --ultra-glass-strong: rgba(20, 24, 32, 0.84);
+  --ultra-stroke: rgba(255, 255, 255, 0.18);
+
+  --ultra-text: rgba(248, 249, 251, 0.97);
+  --ultra-muted: rgba(191, 198, 210, 0.8);
+
+  --ultra-offwhite: #f1efe9;
+  --ultra-silver: #c7ced8;
+  --ultra-smoke: #97a0ad;
+  --ultra-ink: #12161d;
+}
+
+@keyframes ultraGradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+body {
+  background:
+    radial-gradient(58% 54% at 14% 20%, rgba(255, 255, 255, 0.12), transparent 66%),
+    radial-gradient(52% 48% at 84% 18%, rgba(199, 206, 216, 0.16), transparent 68%),
+    radial-gradient(54% 50% at 76% 84%, rgba(151, 160, 173, 0.11), transparent 70%),
+    linear-gradient(165deg, var(--ultra-bg-0) 0%, var(--ultra-bg-1) 54%, var(--ultra-bg-2) 100%);
+  color: var(--ultra-text);
+}
+
+.page--home,
+.page--library,
+.page--playlist,
+.page--profile,
+.page--profile-edit {
+  background:
+    radial-gradient(58% 54% at 14% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 66%),
+    radial-gradient(52% 48% at 84% 18%, rgba(199, 206, 216, 0.15) 0%, transparent 68%),
+    radial-gradient(54% 50% at 76% 84%, rgba(151, 160, 173, 0.1) 0%, transparent 70%),
+    linear-gradient(165deg, #050607 0%, #0f1319 56%, #171c24 100%) !important;
+  color: var(--ultra-text) !important;
+}
+
+.app__background {
+  background:
+    radial-gradient(circle at 15% 20%, #11161d 0%, #0d1118 40%, #080b10 100%) !important;
+}
+
+.noise {
+  opacity: 0.025 !important;
+}
+
+.orb--one {
+  background: radial-gradient(
+    circle,
+    rgba(241, 239, 233, 0.76) 0%,
+    rgba(241, 239, 233, 0.28) 42%,
+    transparent 70%
+  ) !important;
+}
+
+.orb--two {
+  background: radial-gradient(
+    circle,
+    rgba(199, 206, 216, 0.7) 0%,
+    rgba(199, 206, 216, 0.24) 42%,
+    transparent 70%
+  ) !important;
+}
+
+.orb--three {
+  background: radial-gradient(
+    circle,
+    rgba(151, 160, 173, 0.56) 0%,
+    rgba(151, 160, 173, 0.2) 42%,
+    transparent 72%
+  ) !important;
+}
+
+.glass-panel,
+.sidebar,
+.topbar,
+.mini-player,
+.overlay__panel,
+.playlist-hero,
+.track-list,
+.profile-hero,
+.profile-section,
+.library-card,
+.search-result,
+.search-panel,
+.create-playlist-panel,
+.delete-playlist-panel {
+  background: linear-gradient(
+    150deg,
+    rgba(30, 35, 45, 0.76),
+    rgba(20, 24, 32, 0.64)
+  ) !important;
+  border: 1px solid var(--ultra-stroke) !important;
+  backdrop-filter: blur(28px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(145%) !important;
+  box-shadow:
+    0 30px 76px rgba(0, 0, 0, 0.52),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 18px rgba(241, 239, 233, 0.08) !important;
+}
+
+.hero {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.hero__glow {
+  background: radial-gradient(circle, rgba(241, 239, 233, 0.4) 0%, transparent 70%) !important;
+  opacity: 0.36 !important;
+}
+
+.artist-scroller {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.04)),
+    radial-gradient(60% 110% at 0% 50%, rgba(241, 239, 233, 0.16) 0%, transparent 65%),
+    radial-gradient(60% 110% at 100% 50%, rgba(199, 206, 216, 0.14) 0%, transparent 65%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.section__head h2,
+.page__subtitle,
+.sidebar__text,
+.mini-player__title,
+.search-result__title,
+.track-row__name,
+.artist-item__name {
+  color: var(--ultra-text) !important;
+}
+
+.section__hint,
+.track-row__artist,
+.mini-player__artist,
+.search-result__meta,
+.profile-section__meta,
+.section__empty,
+.sidebar__label,
+.hero__subtitle,
+.eyebrow {
+  color: var(--ultra-muted) !important;
+}
+
+.primary-button {
+  background: linear-gradient(
+    112deg,
+    var(--ultra-offwhite) 0%,
+    var(--ultra-silver) 52%,
+    #a7b0be 100%
+  ) !important;
+  background-size: 180% 180% !important;
+  color: var(--ultra-ink) !important;
+  border: 1px solid rgba(255, 255, 255, 0.36) !important;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.42),
+    0 0 18px rgba(241, 239, 233, 0.22) !important;
+  animation: ultraGradientShift 7s linear infinite alternate;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.page--home .ghost-button[aria-pressed="true"] {
+  background: linear-gradient(
+    112deg,
+    var(--ultra-offwhite) 0%,
+    var(--ultra-silver) 56%,
+    var(--ultra-smoke) 100%
+  ) !important;
+  color: var(--ultra-ink) !important;
+  border-color: transparent !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.34) !important;
+}
+
+.ghost-button,
+.text-button,
+.mini-player__expand,
+.sidebar__item,
+.sidebar__playlist,
+.topbar__search,
+.profile-chip,
+.icon-button,
+.artist-item {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: var(--ultra-text) !important;
+}
+
+.ghost-button:hover,
+.text-button:hover,
+.mini-player__expand:hover,
+.sidebar__item:hover,
+.sidebar__playlist:hover,
+.topbar__search:hover,
+.profile-chip:hover,
+.icon-button:hover,
+.artist-item:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.34),
+    0 0 12px rgba(241, 239, 233, 0.16) !important;
+}
+
+.artist-item:focus-visible {
+  outline: 2px solid rgba(241, 239, 233, 0.84) !important;
+  outline-offset: 2px;
+}
+
+.sidebar__item.is-active,
+.sidebar__playlist.is-active,
+.track-row.is-active,
+.album-card.is-active {
+  border-color: rgba(241, 239, 233, 0.7) !important;
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.42),
+    0 0 20px rgba(241, 239, 233, 0.22) !important;
+}
+
+.track-row,
+.album-card,
+.library-card,
+.search-result {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.progress__fill {
+  background: linear-gradient(
+    90deg,
+    var(--ultra-offwhite) 0%,
+    var(--ultra-silver) 54%,
+    var(--ultra-smoke) 100%
+  ) !important;
+  box-shadow: 0 0 12px rgba(241, 239, 233, 0.26) !important;
+}
+
+.art,
+.album-card__cover,
+.artist-item__avatar,
+.mini-player__art,
+.art--full,
+.artist-hero__image,
+.album-hero__image {
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.46),
+    0 0 14px rgba(241, 239, 233, 0.16) !important;
+}
+
+input,
+textarea {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: var(--ultra-text) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--ultra-muted) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(241, 239, 233, 0.68),
+    rgba(199, 206, 216, 0.62),
+    rgba(151, 160, 173, 0.56)
+  );
+  border-radius: 999px;
+}
