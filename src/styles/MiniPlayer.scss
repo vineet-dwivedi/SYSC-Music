@@ -218,7 +218,7 @@
   }
 
   .mini-player__expand {
-    display: none;
+    justify-self: end;
   }
 }
 
@@ -266,6 +266,7 @@
   }
 
   .mini-player__expand {
+    display: block;
     width: 100%;
     text-align: center;
   }
@@ -278,10 +279,12 @@
   }
 
   .mini-player__controls {
-    position: absolute;
-    right: 12px;
-    bottom: 10px;
-    transform: scale(.9);
+    position: static;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    grid-column: 1 / -1;
+    justify-content: center;
   }
 }
 

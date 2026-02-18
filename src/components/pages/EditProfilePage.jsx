@@ -51,7 +51,7 @@ function EditProfilePage({ footer, draft, onChange, onSave, onCancel }) {
           </label>
         </div>
 
-        <div className="profile-edit__actions">
+      <div className="profile-edit__actions">
           <button className="ghost-button" type="button" onClick={onCancel}>
             Cancel
           </button>

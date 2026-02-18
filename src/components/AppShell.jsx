@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import AppBackground from './AppBackground.jsx'
-import Sidebar from './Sidebar.jsx'
 import Topbar from './Topbar.jsx'
 import HomePage from './pages/HomePage.jsx'
 import LibraryPage from './pages/LibraryPage.jsx'
@@ -20,19 +19,9 @@ import ToastStack from './ToastStack.jsx'
 import VolumeHud from './VolumeHud.jsx'
 
 function AppShell({ c }) {
-  const sidebarFooter = (
-    <footer className="page-footer">
-      <Sidebar
-        collapsed={c.sidebarCollapsed}
-        onToggle={() => c.setSidebarCollapsed((value) => !value)}
-        activePage={c.activePage}
-        onNavigate={c.navigate}
-        navItems={c.navItems}
-        playlists={c.playlistItems}
-        activePlaylist={c.activePlaylist}
-        onSelectPlaylist={c.handleSelectPlaylist}
-        onOpenSettings={() => c.setSettingsOpen(true)}
-      />
+  const pageFooter = (
+    <footer className="page-credit" aria-label="Copyright">
+      <span className="page-credit__text">Copyright &copy; Developed By Vineet Dwivedi</span>
     </footer>
   )
 
@@ -43,7 +32,7 @@ function AppShell({ c }) {
           collections={c.libraryCollections}
           albums={c.albums}
           tracks={c.tracks}
-          footer={sidebarFooter}
+          footer={pageFooter}
           onCreatePlaylist={c.handleOpenCreatePlaylist}
           onOpenCollection={c.handleOpenCollection}
           filter={c.libraryFilter}
@@ -64,7 +53,7 @@ function AppShell({ c }) {
           albumArtist={c.activeAlbumArtist}
           albumImage={c.activeAlbumImage}
           tracks={c.activeAlbumTracks}
-          footer={sidebarFooter}
+          footer={pageFooter}
           onPlayAlbum={c.handlePlayCurrentAlbum}
           onPlayTrack={(track) => c.handlePlayTrack(track, c.activeAlbumTracks)}
           currentTrack={c.currentTrack}
@@ -78,7 +67,7 @@ function AppShell({ c }) {
         <ArtistPage
           artistName={c.activeArtist}
           tracks={c.activeArtistTracks}
-          footer={sidebarFooter}
+          footer={pageFooter}
           onPlayArtist={c.handlePlayArtist}
           onPlayTrack={(track) => c.handlePlayTrack(track, c.activeArtistTracks)}
           currentTrack={c.currentTrack}
@@ -91,11 +80,11 @@ function AppShell({ c }) {
       return (
         <PlaylistPage
           tracks={c.playlistTracks}
-          footer={sidebarFooter}
           playlistName={c.activePlaylist}
-          isDownloaded={c.downloadedPlaylists.includes(c.activePlaylist)}
+          playlistOptions={c.playlistItems}
+          onSelectPlaylist={c.handleSelectPlaylist}
+          footer={pageFooter}
           onPlayPlaylist={c.handlePlayPlaylist}
-          onToggleDownload={() => c.handleToggleDownload(c.activePlaylist)}
           onDeletePlaylist={() => c.handleRequestDeletePlaylist(c.activePlaylist)}
           canDelete={c.playlistItems.some((item) => item.name === c.activePlaylist)}
           onPlayTrack={(track) => c.handlePlayTrack(track, c.playlistTracks)}
@@ -108,7 +97,7 @@ function AppShell({ c }) {
     if (c.activePage === 'profile') {
       return (
         <ProfilePage
-          footer={sidebarFooter}
+          footer={pageFooter}
           user={c.profile}
           featuredAlbum={c.profileFeaturedAlbum}
           onEditProfile={c.handleEditProfileOpen}
@@ -121,7 +110,7 @@ function AppShell({ c }) {
     if (c.activePage === 'profile-edit') {
       return (
         <EditProfilePage
-          footer={sidebarFooter}
+          footer={pageFooter}
           draft={c.profileDraft}
           onChange={c.handleProfileDraftChange}
           onSave={c.handleProfileSave}
@@ -133,7 +122,7 @@ function AppShell({ c }) {
       <HomePage
         albums={c.albums}
         tracks={c.tracks}
-        footer={sidebarFooter}
+        footer={pageFooter}
         onPlayAlbum={c.handlePlayAlbum}
         onToggleSaveAlbum={c.handleToggleSaveAlbum}
         savedAlbums={c.savedAlbumSet}
@@ -165,8 +154,6 @@ function AppShell({ c }) {
               <Topbar
                 onSearchOpen={() => c.setSearchOpen(true)}
                 onNavigate={c.navigate}
-                onProfileOpen={c.handleProfileOpen}
-                profile={c.profile}
               />
               <div className="page-stack">
                 <AnimatePresence mode="wait">

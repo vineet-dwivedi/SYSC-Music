@@ -42,9 +42,6 @@
   color: #0b0c10;
 }
 
-
-/* subtle pastel wash */
-
 .track-row::before {
   content: "";
   position: absolute;
@@ -80,11 +77,6 @@
   }
 }
 
-
-/* =========================
-   LEFT AREA
-========================= */
-
 .track-row__title {
   display: flex;
   align-items: center;
@@ -117,11 +109,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-
-/* =========================
-   PLAY BUTTON
-========================= */
 
 .track-row__play {
   width: 36px;
@@ -164,11 +151,6 @@
   transform: scale(.92);
 }
 
-
-/* =========================
-   PROGRESS
-========================= */
-
 .track-row__progress {
   width: 100%;
 }
@@ -203,30 +185,17 @@
   transition: width .2s linear;
 }
 
-
-/* =========================
-   TIME
-========================= */
-
 .track-row__time {
   font-size: .78rem;
   color: rgba(255,255,255,.55);
   letter-spacing: .02em;
 }
 
-
-/* =========================
-   TAP FEEDBACK
-========================= */
-
 .track-row:active {
   transform: scale(.98);
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
+//Responsive
 
 @media (max-width: 900px) {
   .track-row {

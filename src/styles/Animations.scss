@@ -29,6 +29,54 @@
   height: 100%;
 }
 
+.page-credit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  margin-top: 18px;
+  padding-bottom: clamp(170px, 22vh, 250px);
+  pointer-events: none;
+}
+
+.page-credit__text {
+  display: inline-block;
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: rgba(17, 23, 37, 0.88);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  background: linear-gradient(
+    110deg,
+    rgba(255, 255, 255, 0.58),
+    rgba(255, 255, 255, 0.34)
+  );
+  box-shadow:
+    0 8px 22px rgba(47, 67, 104, 0.15),
+    0 0 16px rgba(169, 139, 255, 0.2);
+  animation: creditPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes creditPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow:
+      0 8px 22px rgba(47, 67, 104, 0.14),
+      0 0 14px rgba(169, 139, 255, 0.18);
+  }
+  50% {
+    transform: translateY(-1px);
+    box-shadow:
+      0 10px 26px rgba(47, 67, 104, 0.2),
+      0 0 18px rgba(78, 227, 255, 0.2),
+      0 0 20px rgba(255, 158, 201, 0.18);
+  }
+}
+
 .lens-wipe {
   position: fixed;
   inset: 0;
@@ -87,12 +135,25 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-slide,
-  .animate-card {
+  .animate-card,
+  .page-credit__text {
     animation: none;
   }
 
   .lens-wipe {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+  }
+}
+
+@media (max-width: 740px) {
+  .page-credit {
+    padding-bottom: calc(220px + env(safe-area-inset-bottom));
+  }
+
+  .page-credit__text {
+    font-size: .66rem;
+    letter-spacing: .09em;
+    padding: 6px 10px;
   }
 }

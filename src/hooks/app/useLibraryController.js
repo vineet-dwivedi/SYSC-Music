@@ -44,23 +44,28 @@ function useLibraryController({
     [availableTracks],
   )
 
-  useEffect(() => {
-    const fetchPlaylists = async () => {
-      try {
-        const res = await api.get('/playlists')
-        const list = Array.isArray(res.data) ? res.data.map(normalizePlaylist) : []
-        setPlaylistItems(list)
-        setActivePlaylist((prev) =>
-          list.some((item) => item.name === prev) ? prev : (list[0]?.name ?? ''),
-        )
-      } catch (error) {
-        console.error('Failed to fetch playlists', error)
-        setPlaylistItems([])
-        setActivePlaylist('')
-      }
+  const fetchPlaylists = useCallback(async (preferredName = null) => {
+    try {
+      const res = await api.get('/playlists')
+      const list = Array.isArray(res.data) ? res.data.map(normalizePlaylist) : []
+      setPlaylistItems(list)
+      setActivePlaylist((prev) => {
+        const targetName = typeof preferredName === 'string' ? preferredName : prev
+        if (targetName && list.some((item) => item.name === targetName)) return targetName
+        return list[0]?.name ?? ''
+      })
+      return list
+    } catch (error) {
+      console.error('Failed to fetch playlists', error)
+      setPlaylistItems([])
+      setActivePlaylist('')
+      return []
     }
-    fetchPlaylists()
   }, [])
+
+  useEffect(() => {
+    fetchPlaylists()
+  }, [fetchPlaylists])
 
   useEffect(() => {
     if (!activePlaylistItem?.id) {
@@ -132,24 +137,21 @@ function useLibraryController({
     try {
       const createRes = await api.post('/playlists', { name: trimmed })
       const created = normalizePlaylist(createRes.data, playlistItems.length)
-      const createdId = createRes.data?.id ?? createRes.data?._id ?? created.id
+      const createdId = createRes.data?.id ?? createRes.data?._id ?? created.id ?? null
 
       if (createdId && selectedTrackIds.length > 0) {
         try {
-          const assignRes = await api.post(`/playlists/${createdId}/tracks`, {
+          await api.post(`/playlists/${createdId}/tracks`, {
             trackIds: selectedTrackIds,
           })
-          const assignedTracks = normalizeTracks(assignRes.data?.tracks ?? [])
-          setActivePlaylistTracks(assignedTracks)
         } catch (assignError) {
-          addToast('Playlist created, but song assignment failed', 'info')
+          console.error('Failed to assign tracks to playlist', assignError)
+          addToast('Playlist created, but adding songs failed', 'info')
         }
-      } else {
-        setActivePlaylistTracks([])
       }
 
-      setPlaylistItems((prev) => [...prev, created])
-      setActivePlaylist(created.name)
+      await fetchPlaylists(created.name)
+      if (!selectedTrackIds.length) setActivePlaylistTracks([])
       setActivePage('playlist')
       setScrollTarget(null)
       setCreatePlaylistOpen(false)
@@ -157,9 +159,18 @@ function useLibraryController({
       setSelectedTrackIds([])
       addToast(`Created ${trimmed}`, 'success')
     } catch (error) {
+      console.error('Unable to create playlist on server', error)
       addToast('Unable to create playlist on server', 'info')
     }
-  }, [addToast, playlistDraftName, playlistItems, selectedTrackIds, setActivePage, setScrollTarget])
+  }, [
+    addToast,
+    fetchPlaylists,
+    playlistDraftName,
+    playlistItems,
+    selectedTrackIds,
+    setActivePage,
+    setScrollTarget,
+  ])
 
   const handleSelectPlaylist = useCallback(
     (name) => {
@@ -199,26 +210,22 @@ function useLibraryController({
           await api.delete(`/playlists/${playlistToDelete.id}`)
         }
       } catch (error) {
+        console.error('Unable to delete playlist from server', error)
         addToast('Unable to delete playlist from server', 'info')
         return
       }
-
-      const nextItems = playlistItems.filter((item) => item.name !== name)
-      setPlaylistItems(nextItems)
       setDownloadedPlaylists((prev) => prev.filter((item) => item !== name))
-      setActivePlaylistTracks((prev) =>
-        activePlaylist === name ? [] : prev,
-      )
-
-      if (activePlaylist === name) {
-        const nextActive = nextItems[0]?.name ?? ''
-        setActivePlaylist(nextActive)
-        setActivePage(nextActive ? 'playlist' : 'home')
+      const refreshed = await fetchPlaylists(activePlaylist === name ? null : activePlaylist)
+      if (!refreshed.length) {
+        setActivePlaylistTracks([])
+        setActivePage('home')
+      } else if (activePlaylist === name) {
+        setActivePage('playlist')
       }
 
       addToast(`Deleted "${name}"`, 'info')
     },
-    [activePlaylist, addToast, playlistByName, playlistItems, setActivePage],
+    [activePlaylist, addToast, fetchPlaylists, playlistByName, setActivePage],
   )
 
   const handleRequestDeletePlaylist = useCallback((name) => {

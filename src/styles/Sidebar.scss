@@ -43,12 +43,6 @@
   padding: 24px 16px 120px;
 }
 
-
-
-/* ======================
-   COLLAPSED
-====================== */
-
 .sidebar.is-collapsed {
   width: min(720px, 92vw);
 }
@@ -60,22 +54,12 @@
   transform: translateX(-6px);
 }
 
-
-
-/* ======================
-   HEADER
-====================== */
-
 .sidebar__header {
   display: flex;
   align-items: center;
   gap: 10px;
   flex: 1 1 100%;
 }
-
-
-
-/* mac style traffic lights */
 
 .mac-controls {
   display: flex;
@@ -93,21 +77,9 @@
 .mac-controls span:nth-child(2) { background: #ffbd2e; }
 .mac-controls span:nth-child(3) { background: #28c840; }
 
-
-
-/* ======================
-   TOGGLE
-====================== */
-
 .sidebar__toggle {
   margin-left: auto;
 }
-
-
-
-/* ======================
-   SECTIONS
-====================== */
 
 .sidebar__section {
   display: flex;
@@ -126,11 +98,6 @@
   transition: opacity .3s, transform .3s;
 }
 
-
-
-/* ======================
-   NAV ITEMS
-====================== */
 
 .sidebar__nav,
 .sidebar__playlists {
@@ -191,9 +158,6 @@
 }
 
 
-
-/* subtle pastel glow */
-
 .sidebar__item::before,
 .sidebar__playlist::before {
   content: "";
@@ -215,8 +179,6 @@
   pointer-events: none;
 }
 
-
-
 @media (hover:hover) {
   .sidebar__item:hover,
   .sidebar__playlist:hover {
@@ -229,10 +191,6 @@
     opacity: .4;
   }
 }
-
-
-
-/* active */
 
 .sidebar__item.is-active {
   background: rgba(255,255,255,.16);
@@ -252,19 +210,9 @@
     0 10px 24px rgba(0,0,0,.35);
 }
 
-
-
-/* muted */
-
 .sidebar__item.muted {
   opacity: .6;
 }
-
-
-
-/* ======================
-   PLAYLIST DOT
-====================== */
 
 .dot {
   width: 8px;

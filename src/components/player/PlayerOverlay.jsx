@@ -16,7 +16,8 @@ function PlayerOverlay({
   volumePercent,
   onVolumeChange,
 }) {
-  const artStyle = trackImage ? { backgroundImage: `url(${trackImage})` } : undefined
+  const hasTrackImage = Boolean(trackImage)
+  const artStyle = hasTrackImage ? { backgroundImage: `url(${trackImage})` } : undefined
 
   return (
     <div
@@ -29,8 +30,8 @@ function PlayerOverlay({
           <span className="icon icon--close" />
         </button>
         <div className="full-player__art">
-          <div className="art--full" style={artStyle} />
-          <div className="parallax-sheen" />
+          <div className={`art--full ${hasTrackImage ? '' : 'is-fallback'}`} style={artStyle} />
+          {hasTrackImage ? <div className="parallax-sheen" /> : null}
         </div>
         <div className="full-player__meta">
           <p className="eyebrow">Now playing</p>
@@ -74,7 +75,7 @@ function PlayerOverlay({
           <span className="time">{durationLabel}</span>
         </div>
         <div className="full-player__footer">
-          <button className="ghost-button" type="button" onClick={onAddToQueue}>
+          <button className="ghost-button" type="button" onClick={() => onAddToQueue(track)}>
             Add to queue
           </button>
           <div className="volume">

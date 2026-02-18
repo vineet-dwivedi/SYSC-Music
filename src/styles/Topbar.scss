@@ -32,11 +32,6 @@
 }
 
 
-
-/* =========================
-   SEARCH BAR
-========================= */
-
 .topbar__search {
   position: relative;
 
@@ -110,11 +105,6 @@
 }
 
 
-
-/* =========================
-   ACTIONS GROUP
-========================= */
-
 .topbar__actions {
   display: flex;
   align-items: center;
@@ -122,11 +112,6 @@
   flex-shrink: 0;
 }
 
-
-
-/* =========================
-   GHOST BUTTONS
-========================= */
 
 .ghost-button {
   height: 40px;
@@ -159,12 +144,6 @@
 .ghost-button:active {
   transform: scale(.95);
 }
-
-
-
-/* =========================
-   PROFILE CHIP
-========================= */
 
 .profile-chip {
   display: flex;
@@ -227,11 +206,7 @@
   color: rgba(255,255,255,.55);
 }
 
-
-
-/* =========================
-   RESPONSIVE
-========================= */
+//Responsive
 
 @media (max-width: 1024px) {
   .topbar__search {
@@ -281,29 +256,22 @@
   }
 
   .topbar__actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
   }
 
-  .ghost-button {
-    display: none;
-  }
-
-  .profile-chip {
+  .topbar__nav-button {
+    width: 100%;
+    height: 38px;
     padding: 0 10px;
-  }
-
-  .profile-chip__meta {
-    display: none;
+    font-size: .8rem;
   }
 }
 
 @media (max-width: 420px) {
   .topbar {
-    padding: 0 12px;
-  }
-
-  .profile-chip__avatar {
-    width: 28px;
-    height: 28px;
+    padding: 10px 12px;
   }
 }

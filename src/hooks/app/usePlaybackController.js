@@ -269,14 +269,40 @@ function usePlaybackController({ addToast }) {
     if (prevTrack) addToast(`Now playing "${prevTrack.title}"`, 'info')
   }, [queue, currentTrackIndex, addToast])
 
-  const handleAddToQueue = useCallback(() => {
-    if (!currentTrack) {
-      addToast('Select a track to add to queue', 'info')
-      return
-    }
-    setQueue((prev) => [...prev, currentTrack])
-    addToast(`Added "${currentTrack.title}" to queue`, 'success')
-  }, [currentTrack, addToast])
+  const handleAddToQueue = useCallback(
+    (trackToQueue) => {
+      const isLikelyClickEvent =
+        trackToQueue &&
+        typeof trackToQueue === 'object' &&
+        ('nativeEvent' in trackToQueue || 'currentTarget' in trackToQueue)
+
+      const nextTrack = isLikelyClickEvent ? currentTrack : trackToQueue ?? currentTrack
+
+      if (!nextTrack) {
+        addToast('Select a track to add to queue', 'info')
+        return
+      }
+
+      setQueue((prev) => {
+        const baseQueue = prev.length ? prev : tracks
+        if (!baseQueue.length) return [nextTrack]
+
+        const insertIndex =
+          currentTrackIndex === null
+            ? baseQueue.length
+            : Math.min(baseQueue.length, currentTrackIndex + 1)
+
+        return [
+          ...baseQueue.slice(0, insertIndex),
+          nextTrack,
+          ...baseQueue.slice(insertIndex),
+        ]
+      })
+
+      addToast(`Queued next: "${nextTrack.title ?? 'track'}"`, 'success')
+    },
+    [addToast, currentTrack, currentTrackIndex, tracks],
+  )
 
   const handleShare = useCallback(async () => {
     if (!currentTrack) {

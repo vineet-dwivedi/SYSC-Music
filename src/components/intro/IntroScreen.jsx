@@ -58,6 +58,13 @@ function IntroScreen({ onEnter }) {
         delay: 0.5,
         ease: 'power3.out',
       })
+      gsap.from('.intro__credit', {
+        y: 10,
+        opacity: 0,
+        duration: 0.8,
+        delay: 0.58,
+        ease: 'power3.out',
+      })
 
       gsap.to('.intro__glow', {
         opacity: 0.9,
@@ -270,6 +277,7 @@ function IntroScreen({ onEnter }) {
           Enter SYSC
         </motion.button>
         <p className="intro__hint">Move your cursor or press Enter</p>
+        <p className="intro__credit">Developed by Vineet Dwivedi</p>
       </div>
     </motion.section>
   )

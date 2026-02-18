@@ -162,15 +162,15 @@ function useAppController() {
   const currentTrackImage = useMemo(() => {
     const directImage = resolveImageUrl(currentTrack?.coverImage ?? currentTrack?.cover)
     if (directImage) return directImage
-    const albumName = currentTrack?.album
-    if (albumName) {
-      const selectedAlbum = albums.find(
-        (album) => normalizeText(album?.title) === normalizeText(albumName),
-      )
+    const candidateAlbumNames = [currentTrack?.album, currentTrack?.title].filter(Boolean)
+
+    for (const name of candidateAlbumNames) {
+      const selectedAlbum = albums.find((album) => normalizeText(album?.title) === normalizeText(name))
       const albumImage = resolveImageUrl(selectedAlbum?.coverImage) || resolveImageUrl(selectedAlbum?.art)
       if (albumImage) return albumImage
     }
-    return ''
+
+    return resolveImageUrl(albums[0]?.coverImage) || resolveImageUrl(albums[0]?.art) || ''
   }, [albums, currentTrack])
   const getArtistTracks = useCallback(
     (artistName, sourceTracks = tracks) => {

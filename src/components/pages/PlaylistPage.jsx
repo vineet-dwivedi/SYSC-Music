@@ -4,9 +4,9 @@ function PlaylistPage({
   tracks,
   footer,
   playlistName,
-  isDownloaded,
+  playlistOptions = [],
+  onSelectPlaylist,
   onPlayPlaylist,
-  onToggleDownload,
   onDeletePlaylist,
   canDelete,
   onPlayTrack,
@@ -24,6 +24,27 @@ function PlaylistPage({
         </div>
         <div className="playlist-hero__meta">
           <p className="eyebrow">Playlist</p>
+          {playlistOptions.length ? (
+            <label className="playlist-hero__picker">
+              <span className="playlist-hero__picker-label">Choose playlist</span>
+              <select
+                value={hasPlaylist ? playlistName : ''}
+                onChange={(event) => onSelectPlaylist?.(event.target.value)}
+                disabled={!playlistOptions.length}
+              >
+                {!hasPlaylist ? <option value="">Select playlist</option> : null}
+                {playlistOptions.map((playlist, index) => {
+                  const optionName = playlist?.name ?? `Playlist ${index + 1}`
+                  const optionId = playlist?.id ?? optionName
+                  return (
+                    <option key={optionId} value={optionName}>
+                      {optionName}
+                    </option>
+                  )
+                })}
+              </select>
+            </label>
+          ) : null}
           <h2>{displayName}</h2>
           <p className="page__subtitle">
             {hasPlaylist
@@ -33,15 +54,6 @@ function PlaylistPage({
           <div className="playlist-hero__actions">
             <button className="primary-button" type="button" onClick={onPlayPlaylist} disabled={!hasPlaylist}>
               Play playlist
-            </button>
-            <button
-              className={`ghost-button ${isDownloaded ? 'is-active' : ''}`}
-              type="button"
-              onClick={onToggleDownload}
-              aria-pressed={isDownloaded}
-              disabled={!hasPlaylist}
-            >
-              {isDownloaded ? 'Downloaded' : 'Download'}
             </button>
             <button
               className="ghost-button is-danger"

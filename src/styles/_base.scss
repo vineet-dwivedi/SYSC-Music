@@ -1,13 +1,3 @@
-/* =========================================
-   SYSC -- Base Styles
-   Reset, tokens, utilities, layout
-   ========================================= */
-
-
-/* =========================================
-   1. CSS RESET / NORMALIZE
-   ========================================= */
-
 *,
 *::before,
 *::after {
@@ -71,13 +61,8 @@ svg {
 }
 
 
-
-/* =========================================
-   2. DESIGN TOKENS (GLOBAL VARIABLES)
-   ========================================= */
-
 :root {
-  /* Colors */
+  //Colors
   --bg: #06080d;
   --bg-soft: #0d1118;
 
@@ -87,40 +72,33 @@ svg {
   --accent: #7afcff;
   --accent-strong: #3ec7ff;
 
-  /* Glass */
+  //Glass
   --glass: rgba(255, 255, 255, 0.06);
   --glass-strong: rgba(255, 255, 255, 0.1);
   --border-soft: rgba(255, 255, 255, 0.08);
 
-  /* Radius */
+  //Radius
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
   --radius-xl: 30px;
 
-  /* Shadows */
+  //Shadow
   --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.5);
   --glow: 0 0 24px rgba(122, 252, 255, 0.25);
 
-  /* Blur */
+  //Blur
   --blur-lg: 22px;
 }
 
-
-
-/* =========================================
-   3. GLOBAL UTILITIES
-   (Reusable everywhere)
-   ========================================= */
-
-/* ---------- Glass panel ---------- */
+//Glass
 .glass {
   background: var(--glass);
   backdrop-filter: blur(var(--blur-lg));
   border: 1px solid var(--border-soft);
 }
 
-/* ---------- Scrollbar ---------- */
+//Scroller
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -129,7 +107,7 @@ svg {
   border-radius: 999px;
 }
 
-/* ---------- Buttons ---------- */
+//Button
 
 .primary-button {
   padding: 12px 26px;
@@ -167,7 +145,7 @@ svg {
   color: var(--text);
 }
 
-/* ---------- Icon button ---------- */
+//Icon Button
 
 .icon-button {
   width: 36px;
@@ -185,12 +163,7 @@ svg {
   background: var(--glass);
 }
 
-
-
-/* =========================================
-   4. LAYOUT HELPERS
-   ========================================= */
-
+//Layout
 .app {
   height: 100%;
   display: flex;

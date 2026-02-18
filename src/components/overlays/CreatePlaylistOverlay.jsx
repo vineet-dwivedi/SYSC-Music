@@ -51,15 +51,24 @@ function CreatePlaylistOverlay({
               const trackId = track.id ?? track._id ?? null
               const trackKey = trackId ?? `${track.title}-${track.artist}-${index}`
               const isChecked = trackId ? selectedSet.has(trackId) : false
+              const isSelectable = Boolean(trackId)
+              const title = track?.title ?? 'Untitled'
+              const artist = track?.artist ?? 'Unknown Artist'
               return (
-                <label key={trackKey} className="create-playlist__track-item">
+                <label
+                  key={trackKey}
+                  className={`create-playlist__track-item ${isChecked ? 'is-selected' : ''} ${isSelectable ? '' : 'is-disabled'}`}
+                >
                   <input
                     type="checkbox"
                     checked={isChecked}
-                    disabled={!trackId}
+                    disabled={!isSelectable}
                     onChange={() => onToggleTrack?.(trackId)}
                   />
-                  <span>{track.title} - {track.artist}</span>
+                  <span className="create-playlist__track-copy">
+                    <span className="create-playlist__track-title">{title}</span>
+                    <span className="create-playlist__track-artist">{artist}</span>
+                  </span>
                 </label>
               )
             })}
