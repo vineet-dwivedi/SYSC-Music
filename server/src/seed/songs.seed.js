@@ -11,8 +11,8 @@ const songs = [
     album: "Single",
     genre: "Demo",
     duration: 214,
-    coverImage: "http://localhost:5000/public/images/cover1.jpg",
-    audioUrl: "http://localhost:5000/public/audio/song1.mp3"
+    coverImage: "/public/images/cover1.jpg",
+    audioUrl: "/public/audio/song1.mp3"
   }
 ];
 
