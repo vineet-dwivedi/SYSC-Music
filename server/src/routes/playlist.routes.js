@@ -6,6 +6,7 @@ import Song from '../models/song.model.js';
 const router = express.Router();
 
 const isLocalHost = (host) => host === 'localhost' || host === '127.0.0.1';
+const isHttpProtocol = (protocol) => protocol === 'http:';
 
 const toAbsoluteUrl = (value, req) => {
   if (!value) return '';
@@ -14,6 +15,14 @@ const toAbsoluteUrl = (value, req) => {
   if (/^https?:\/\//i.test(value)) {
     try {
       const parsed = new URL(value);
+      const requestProtocol = `${req.protocol}:`;
+      const requestHost = req.get('host');
+      const isSameHost = parsed.host === requestHost;
+
+      if (isHttpProtocol(parsed.protocol) && (isSameHost || isLocalHost(parsed.hostname))) {
+        return `${requestProtocol}//${parsed.host}${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+
       if (isLocalHost(parsed.hostname)) {
         return `${baseUrl}${parsed.pathname}${parsed.search}${parsed.hash}`;
       }

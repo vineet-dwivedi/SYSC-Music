@@ -47,7 +47,12 @@ const getApiOrigin = () => {
 
 const toAbsoluteUrl = (value) => {
   if (!value) return ''
-  if (/^https?:\/\//i.test(value)) return value
+  if (/^https?:\/\//i.test(value)) {
+    if (import.meta.env.PROD && value.startsWith('http://')) {
+      return value.replace(/^http:\/\//i, 'https://')
+    }
+    return value
+  }
   const origin = getApiOrigin()
   return `${origin}${value.startsWith('/') ? '' : '/'}${value}`
 }
