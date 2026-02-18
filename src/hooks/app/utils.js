@@ -35,10 +35,21 @@ const getClientX = (event) => {
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
+const FALLBACK_API_BASE = import.meta.env.PROD
+  ? 'https://sysc-music.onrender.com/api'
+  : 'http://localhost:5000/api'
+
+const getApiOrigin = () => {
+  const rawBase = (import.meta.env.VITE_API_BASE_URL || FALLBACK_API_BASE).trim()
+  const normalized = rawBase.replace(/\/+$/, '')
+  return normalized.replace(/\/api$/i, '')
+}
+
 const toAbsoluteUrl = (value) => {
   if (!value) return ''
   if (/^https?:\/\//i.test(value)) return value
-  return `http://localhost:5000${value.startsWith('/') ? '' : '/'}${value}`
+  const origin = getApiOrigin()
+  return `${origin}${value.startsWith('/') ? '' : '/'}${value}`
 }
 
 const normalizeTracks = (data) =>
