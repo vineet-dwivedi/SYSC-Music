@@ -97,6 +97,11 @@
 }
 
 @media (max-width: 640px) {
+  .page--profile-edit {
+    gap: 24px;
+    padding: 24px 14px calc(112px + env(safe-area-inset-bottom));
+  }
+
   .profile-edit__grid {
     grid-template-columns: 1fr;
   }
@@ -113,7 +118,7 @@
 
 @media (max-width: 480px) {
   .page--profile-edit {
-    padding: 22px 14px 70px;
+    padding: 18px 10px calc(96px + env(safe-area-inset-bottom));
   }
 
   .profile-edit {

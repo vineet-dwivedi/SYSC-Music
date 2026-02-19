@@ -158,6 +158,11 @@
 }
 
 @media (max-width: 640px) {
+  .page--profile {
+    gap: 24px;
+    padding: 24px 14px calc(112px + env(safe-area-inset-bottom));
+  }
+
   .profile-stats {
     grid-template-columns: 1fr;
   }
@@ -178,7 +183,7 @@
 
 @media (max-width: 480px) {
   .page--profile {
-    padding: 22px 14px 70px;
+    padding: 18px 10px calc(96px + env(safe-area-inset-bottom));
   }
 
   .profile-hero {

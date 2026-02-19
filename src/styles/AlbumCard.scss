@@ -125,11 +125,21 @@
   font-size: 0.98rem;
   font-weight: 600;
   letter-spacing: -.01em;
+  line-height: 1.25;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.5em;
 }
 
 .album-card__meta p {
   font-size: .82rem;
   color: rgba(12, 12, 12, 0.6);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .album-card__action {
@@ -182,15 +192,34 @@
 @media (max-width: 768px) {
   .album-card {
     padding: 12px;
+    gap: 10px 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "cover cover"
+      "meta action";
+    align-items: center;
   }
   .album-card__cover,
   .album-card .art {
+    grid-area: cover;
     height: 132px;
+  }
+  .album-card__meta {
+    grid-area: meta;
+    min-width: 0;
+    padding: 0;
   }
   .album-card__meta h3 {
     font-size: .92rem;
+    min-height: 2.4em;
   }
   .album-card__action {
+    grid-area: action;
+    position: static;
+    align-self: end;
+    justify-self: end;
+    margin: 0;
     opacity: 1;
     transform: none;
     width: 40px;

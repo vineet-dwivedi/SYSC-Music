@@ -245,8 +245,22 @@
 
 @media (max-width: 420px) {
   .track-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    padding: 9px 10px;
+  }
+
+  .track-row__title {
     gap: 10px;
+  }
+
+  .track-row__artist {
+    display: none;
+  }
+
+  .track-row__play {
+    width: 30px;
+    height: 30px;
   }
 
   .track-row__time {

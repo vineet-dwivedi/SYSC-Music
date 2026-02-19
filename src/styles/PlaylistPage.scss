@@ -328,6 +328,11 @@ justify-content: center;
 }
 
 @media (max-width: 768px) {
+  .page--playlist {
+    padding: 26px 16px calc(118px + env(safe-area-inset-bottom));
+    gap: 28px;
+  }
+
   .playlist-hero__picker {
     max-width: none;
   }
@@ -372,7 +377,7 @@ justify-content: center;
 
 @media (max-width: 480px) {
   .page--playlist {
-    padding: 22px 14px 70px;
+    padding: 18px 10px calc(96px + env(safe-area-inset-bottom));
   }
 
   .art--playlist {

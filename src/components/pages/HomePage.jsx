@@ -9,7 +9,6 @@ function HomePage({
   onPlayAlbum,
   onOpenAlbum,
   onOpenArtist,
-  onToggleSaveAlbum,
   savedAlbums,
   onNavigate,
   onPlayTrack,
@@ -18,8 +17,6 @@ function HomePage({
   activeAlbum,
   playbackProgress,
 }) {
-  const heroAlbum = albums[0]
-  const isHeroSaved = heroAlbum ? savedAlbums.has(heroAlbum.title) : false
   const artistNames = Object.keys(artistImages)
   const artists = Array.from(
     artistNames.reduce((map, name) => {
@@ -42,49 +39,15 @@ function HomePage({
 
   return (
     <section className="page page--home">
-      <div className="hero glass-panel animate-fade-slide">
-        <div className="hero__copy">
-          <p className="eyebrow">Ambient Sessions</p>
-          <h1>{heroAlbum?.title ?? 'Yours Truly'}</h1>
-          <p className="hero__subtitle">
-            Cinema-grade mixes engineered for clarity, focus, and slow-night momentum.
-          </p>
-          <div className="hero__actions">
-            <button
-              className="primary-button"
-              type="button"
-              onClick={() => heroAlbum && onPlayAlbum(heroAlbum, tracks)}
-            >
-              Play album
-            </button>
-            <button
-              className="ghost-button"
-              type="button"
-              onClick={() => heroAlbum && onToggleSaveAlbum(heroAlbum.title)}
-              aria-pressed={isHeroSaved}
-            >
-              {isHeroSaved ? 'Saved' : 'Add to library'}
-            </button>
-          </div>
-          <div className="hero__stats">
-            <div>
-              <p className="stat__value">42 min</p>
-              <p className="stat__label">Runtime</p>
-            </div>
-            <div>
-              <p className="stat__value">12 tracks</p>
-              <p className="stat__label">Edition</p>
-            </div>
-            <div>
-              <p className="stat__value">Lossless</p>
-              <p className="stat__label">Quality</p>
-            </div>
-          </div>
-        </div>
-        <div className="hero__art">
-          <div className="art art--hero" />
-          <div className="hero__glow" />
-        </div>
+      <div className="ambient-wave-panel glass-panel animate-fade-slide" aria-hidden="true">
+        <div className="ambient-wave-panel__gradient" />
+        <div className="ambient-wave-panel__orb ambient-wave-panel__orb--one" />
+        <div className="ambient-wave-panel__orb ambient-wave-panel__orb--two" />
+        <div className="ambient-wave-panel__orb ambient-wave-panel__orb--three" />
+        <div className="ambient-wave-panel__sheen" />
+        <span className="ambient-wave-panel__title">AMBIENT SESSION</span>
+        <div className="ambient-wave-panel__veil" />
+        <div className="ambient-wave-panel__glow" />
       </div>
 
       <div className="section">

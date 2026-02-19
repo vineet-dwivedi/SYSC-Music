@@ -38,18 +38,28 @@ function MiniPlayer({
         </div>
       </div>
       <div className="mini-player__controls">
-        <button className="icon-button" type="button" aria-label="Previous track" onClick={onPrev}>
+        <button
+          className="icon-button mini-player__control mini-player__control--prev"
+          type="button"
+          aria-label="Previous track"
+          onClick={onPrev}
+        >
           <span className="icon icon--prev" />
         </button>
         <button
-          className="icon-button is-primary"
+          className="icon-button mini-player__control mini-player__control--play is-primary"
           type="button"
           aria-label={isPlaying ? 'Pause' : 'Play'}
           onClick={onPlayToggle}
         >
           <span className={`icon ${isPlaying ? 'icon--pause' : 'icon--play'}`} />
         </button>
-        <button className="icon-button" type="button" aria-label="Next track" onClick={onNext}>
+        <button
+          className="icon-button mini-player__control mini-player__control--next"
+          type="button"
+          aria-label="Next track"
+          onClick={onNext}
+        >
           <span className="icon icon--next" />
         </button>
       </div>

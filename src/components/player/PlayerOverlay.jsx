@@ -75,10 +75,14 @@ function PlayerOverlay({
           <span className="time">{durationLabel}</span>
         </div>
         <div className="full-player__footer">
-          <button className="ghost-button" type="button" onClick={() => onAddToQueue(track)}>
+          <button
+            className="ghost-button full-player__queue-btn"
+            type="button"
+            onClick={() => onAddToQueue(track)}
+          >
             Add to queue
           </button>
-          <div className="volume">
+          <div className="volume full-player__volume">
             <span className="icon icon--volume" />
             <div
               className="progress progress--volume"
@@ -98,7 +102,7 @@ function PlayerOverlay({
             </div>
             <span className="volume__value">{volumePercent ?? 0}%</span>
           </div>
-          <button className="ghost-button" type="button" onClick={onShare}>
+          <button className="ghost-button full-player__share-btn" type="button" onClick={onShare}>
             Share
           </button>
         </div>

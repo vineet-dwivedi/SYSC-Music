@@ -253,6 +253,11 @@ grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
 }
 
 @media (max-width: 768px) {
+  .page--library {
+    padding: 26px 16px calc(118px + env(safe-area-inset-bottom));
+    gap: 30px;
+  }
+
   .page__header {
     flex-direction: column;
     align-items: flex-start;
@@ -283,7 +288,7 @@ grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
 
 @media (max-width: 480px) {
   .page--library {
-    padding: 22px 14px 70px;
+    padding: 18px 10px calc(96px + env(safe-area-inset-bottom));
   }
 
   .library-grid {
