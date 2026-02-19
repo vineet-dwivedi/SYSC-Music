@@ -54,6 +54,8 @@ backdrop-filter: blur(var(--glass-blur-heavy)) saturate(140%);
   padding: 28px;
   border-radius: var(--radius-xl);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
 background: linear-gradient(
 145deg,
@@ -202,6 +204,10 @@ background .35s,
 box-shadow .35s;
 }
 
+.search-result > div {
+min-width: 0;
+}
+
 .search-result:hover {
 transform: translateY(-3px) scale(1.02);
 background: rgba(255,255,255,.62);
@@ -236,11 +242,17 @@ box-shadow: 0 6px 18px rgba(0,0,0,.5);
 color: var(--text-primary);
 font-weight: 500;
 font-size: .92rem;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
 }
 
 .search-result__meta {
 color: var(--text-secondary);
 font-size: .78rem;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
 }
 
 .text-button {
@@ -266,25 +278,31 @@ box-shadow: 0 8px 18px rgba(0,0,0,.35);
 
 @media (max-width: 640px) {
   .search-overlay {
-    align-items: end;
-    padding-bottom: env(safe-area-inset-bottom);
+    place-items: center;
+    padding: 12px;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
   }
 
   .search-panel {
-    width: 100vw;
-    max-width: none;
-    max-height: min(78vh, 620px);
-    border-radius: 22px 22px 0 0;
-    padding: 16px 14px 14px;
+    width: min(96vw, 540px);
+    max-width: 540px;
+    max-height: min(82dvh, 640px);
+    border-radius: 20px;
+    padding: 14px 12px;
   }
 
   .search-panel__results {
-    margin-top: 14px;
-    max-height: calc(78vh - 126px);
+    margin-top: 12px;
+    max-height: calc(min(82dvh, 640px) - 126px);
+    padding-right: 2px;
   }
 
   .search-result {
     grid-template-columns: 40px 1fr;
+    gap: 10px;
+    padding: 10px 11px;
   }
 
   .text-button {
@@ -292,7 +310,7 @@ box-shadow: 0 8px 18px rgba(0,0,0,.35);
   }
 }
 
-@media (max-width: 768px) {
+@media (min-width: 641px) and (max-width: 768px) {
   .search-panel {
     width: 96vw;
     max-height: 88vh;
