@@ -16,21 +16,39 @@ const app = express();
 
 dotenv.config();
 
+const normalizeOrigin = (value) => value.trim().replace(/\/+$/, '');
+
 const configuredOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || '')
   .split(',')
-  .map((item) => item.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 
 const allowedOrigins = new Set([
   'http://localhost:5173',
   'http://localhost:4173',
   'http://localhost:3000',
+  'https://sysc-music.vercel.app',
   ...configuredOrigins,
 ]);
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  const normalizedOrigin = normalizeOrigin(origin);
+  if (allowedOrigins.has(normalizedOrigin)) return true;
+
+  // Allow Vercel preview deployments.
+  try {
+    const parsed = new URL(normalizedOrigin);
+    return parsed.protocol === 'https:' && parsed.hostname.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+};
+
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.has(origin)) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
       return;
     }

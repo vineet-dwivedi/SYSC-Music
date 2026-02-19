@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const FALLBACK_API_BASE = import.meta.env.PROD
-  ? "http://sysc-music.onrender.com/api"
+  ? "https://sysc-music.onrender.com/api"
   : "http://localhost:5000/api";
 
 const resolveApiBase = () => {
