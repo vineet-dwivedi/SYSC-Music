@@ -52,7 +52,7 @@ const corsOptions = {
       callback(null, true);
       return;
     }
-    callback(new Error('Not allowed by CORS'));
+    callback(null, false);
   },
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
 };
