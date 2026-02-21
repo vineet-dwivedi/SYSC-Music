@@ -8,7 +8,7 @@ function useToastManager() {
     setToasts((prev) => [...prev, { id, message, tone }])
     window.setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id))
-    }, 3200)
+    }, 1500)
   }, [])
 
   const dismissToast = useCallback((id) => {

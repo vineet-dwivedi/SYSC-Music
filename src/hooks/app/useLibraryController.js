@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import api from '../../services/api.js'
 import { hydrateTrackDurations, normalizeTracks } from './utils.js'
+
+const PLAYLISTS_STORAGE_KEY = 'sysc.playlists.v1'
+const ACTIVE_PLAYLIST_STORAGE_KEY = 'sysc.activePlaylist.v1'
 
 const normalizePlaylist = (playlist, index = 0) => ({
   id: playlist?.id ?? playlist?._id ?? `playlist-${index}`,
@@ -8,9 +10,56 @@ const normalizePlaylist = (playlist, index = 0) => ({
   coverImage: playlist?.coverImage ?? '',
   description: playlist?.description ?? '',
   movieTitle: playlist?.movieTitle ?? '',
+  trackIds: Array.isArray(playlist?.trackIds)
+    ? playlist.trackIds.map((id) => String(id)).filter(Boolean)
+    : [],
 })
 
-const resolveTrackId = (track) => track?.id ?? track?._id ?? null
+const resolveTrackId = (track) => {
+  const raw = track?.id ?? track?._id ?? null
+  return raw === null || raw === undefined ? null : String(raw)
+}
+
+const getStorage = () => (typeof window !== 'undefined' ? window.localStorage : null)
+
+const loadPlaylistsFromStorage = () => {
+  const storage = getStorage()
+  if (!storage) return []
+  try {
+    const raw = storage.getItem(PLAYLISTS_STORAGE_KEY)
+    const parsed = raw ? JSON.parse(raw) : []
+    return Array.isArray(parsed) ? parsed.map(normalizePlaylist) : []
+  } catch (error) {
+    console.error('Failed to read playlists from local storage', error)
+    return []
+  }
+}
+
+const savePlaylistsToStorage = (playlists) => {
+  const storage = getStorage()
+  if (!storage) return
+  try {
+    storage.setItem(PLAYLISTS_STORAGE_KEY, JSON.stringify(playlists))
+  } catch (error) {
+    console.error('Failed to save playlists to local storage', error)
+  }
+}
+
+const loadActivePlaylistFromStorage = () => {
+  const storage = getStorage()
+  if (!storage) return ''
+  return storage.getItem(ACTIVE_PLAYLIST_STORAGE_KEY) ?? ''
+}
+
+const saveActivePlaylistToStorage = (playlistName) => {
+  const storage = getStorage()
+  if (!storage) return
+  if (playlistName) {
+    storage.setItem(ACTIVE_PLAYLIST_STORAGE_KEY, playlistName)
+  } else {
+    storage.removeItem(ACTIVE_PLAYLIST_STORAGE_KEY)
+  }
+}
 
 function useLibraryController({
   addToast,
@@ -21,8 +70,8 @@ function useLibraryController({
 }) {
   const [savedAlbums, setSavedAlbums] = useState([])
   const [libraryFilter, setLibraryFilter] = useState('all')
-  const [playlistItems, setPlaylistItems] = useState([])
-  const [activePlaylist, setActivePlaylist] = useState('')
+  const [playlistItems, setPlaylistItems] = useState(() => loadPlaylistsFromStorage())
+  const [activePlaylist, setActivePlaylist] = useState(() => loadActivePlaylistFromStorage())
   const [activePlaylistTracks, setActivePlaylistTracks] = useState([])
   const [downloadedPlaylists, setDownloadedPlaylists] = useState([])
   const [createPlaylistOpen, setCreatePlaylistOpen] = useState(false)
@@ -44,49 +93,49 @@ function useLibraryController({
     [availableTracks],
   )
 
-  const fetchPlaylists = useCallback(async (preferredName = null) => {
-    try {
-      const res = await api.get('/playlists')
-      const list = Array.isArray(res.data) ? res.data.map(normalizePlaylist) : []
-      setPlaylistItems(list)
-      setActivePlaylist((prev) => {
-        const targetName = typeof preferredName === 'string' ? preferredName : prev
-        if (targetName && list.some((item) => item.name === targetName)) return targetName
-        return list[0]?.name ?? ''
-      })
-      return list
-    } catch (error) {
-      console.error('Failed to fetch playlists', error)
-      setPlaylistItems([])
-      setActivePlaylist('')
-      return []
-    }
-  }, [])
+  useEffect(() => {
+    savePlaylistsToStorage(playlistItems)
+  }, [playlistItems])
 
   useEffect(() => {
-    fetchPlaylists()
-  }, [fetchPlaylists])
+    setActivePlaylist((prev) => {
+      if (prev && playlistItems.some((item) => item.name === prev)) return prev
+      return playlistItems[0]?.name ?? ''
+    })
+  }, [playlistItems])
 
   useEffect(() => {
-    if (!activePlaylistItem?.id) {
+    saveActivePlaylistToStorage(activePlaylist)
+  }, [activePlaylist])
+
+  useEffect(() => {
+    if (!activePlaylistItem) {
       setActivePlaylistTracks([])
       return
     }
 
-    const fetchPlaylistTracks = async () => {
-      try {
-        const res = await api.get(`/playlists/${activePlaylistItem.id}/tracks`)
-        const normalized = normalizeTracks(res.data?.tracks ?? [])
-        setActivePlaylistTracks(normalized)
-        const enriched = await hydrateTrackDurations(normalized)
-        setActivePlaylistTracks(enriched)
-      } catch (error) {
-        console.error('Failed to fetch playlist tracks', error)
-        setActivePlaylistTracks([])
-      }
+    const tracksById = new Map()
+    availableTracks.forEach((track) => {
+      const id = resolveTrackId(track)
+      if (id) tracksById.set(id, track)
+    })
+
+    const orderedTracks = (activePlaylistItem.trackIds ?? [])
+      .map((trackId) => tracksById.get(String(trackId)))
+      .filter(Boolean)
+    const normalized = normalizeTracks(orderedTracks)
+    setActivePlaylistTracks(normalized)
+
+    let isCancelled = false
+    const enrich = async () => {
+      const enriched = await hydrateTrackDurations(normalized)
+      if (!isCancelled) setActivePlaylistTracks(enriched)
     }
-    fetchPlaylistTracks()
-  }, [activePlaylistItem])
+    enrich()
+    return () => {
+      isCancelled = true
+    }
+  }, [activePlaylistItem, availableTracks])
 
   const handleToggleSaveAlbum = useCallback(
     (title) => {
@@ -117,12 +166,15 @@ function useLibraryController({
 
   const handleToggleCreatePlaylistTrack = useCallback((trackId) => {
     if (!trackId) return
+    const normalizedTrackId = String(trackId)
     setSelectedTrackIds((prev) =>
-      prev.includes(trackId) ? prev.filter((id) => id !== trackId) : [...prev, trackId],
+      prev.includes(normalizedTrackId)
+        ? prev.filter((id) => id !== normalizedTrackId)
+        : [...prev, normalizedTrackId],
     )
   }, [])
 
-  const handleCreatePlaylist = useCallback(async () => {
+  const handleCreatePlaylist = useCallback(() => {
     const trimmed = playlistDraftName.trim()
     if (!trimmed) {
       addToast('Enter a playlist name', 'info')
@@ -133,38 +185,25 @@ function useLibraryController({
       addToast('Playlist already exists', 'info')
       return
     }
-
-    try {
-      const createRes = await api.post('/playlists', { name: trimmed })
-      const created = normalizePlaylist(createRes.data, playlistItems.length)
-      const createdId = createRes.data?.id ?? createRes.data?._id ?? created.id ?? null
-
-      if (createdId && selectedTrackIds.length > 0) {
-        try {
-          await api.post(`/playlists/${createdId}/tracks`, {
-            trackIds: selectedTrackIds,
-          })
-        } catch (assignError) {
-          console.error('Failed to assign tracks to playlist', assignError)
-          addToast('Playlist created, but adding songs failed', 'info')
-        }
-      }
-
-      await fetchPlaylists(created.name)
-      if (!selectedTrackIds.length) setActivePlaylistTracks([])
-      setActivePage('playlist')
-      setScrollTarget(null)
-      setCreatePlaylistOpen(false)
-      setPlaylistDraftName('')
-      setSelectedTrackIds([])
-      addToast(`Created ${trimmed}`, 'success')
-    } catch (error) {
-      console.error('Unable to create playlist on server', error)
-      addToast('Unable to create playlist on server', 'info')
-    }
+    const created = normalizePlaylist(
+      {
+        id: `playlist-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: trimmed,
+        trackIds: selectedTrackIds,
+      },
+      playlistItems.length,
+    )
+    setPlaylistItems((prev) => [...prev, created])
+    setActivePlaylist(created.name)
+    if (!selectedTrackIds.length) setActivePlaylistTracks([])
+    setActivePage('playlist')
+    setScrollTarget(null)
+    setCreatePlaylistOpen(false)
+    setPlaylistDraftName('')
+    setSelectedTrackIds([])
+    addToast(`Created ${trimmed}`, 'success')
   }, [
     addToast,
-    fetchPlaylists,
     playlistDraftName,
     playlistItems,
     selectedTrackIds,
@@ -200,32 +239,29 @@ function useLibraryController({
   )
 
   const handleDeletePlaylist = useCallback(
-    async (name) => {
+    (name) => {
       if (!name) return
       const playlistToDelete = playlistByName.get(name)
       if (!playlistToDelete) return
 
-      try {
-        if (playlistToDelete.id) {
-          await api.delete(`/playlists/${playlistToDelete.id}`)
-        }
-      } catch (error) {
-        console.error('Unable to delete playlist from server', error)
-        addToast('Unable to delete playlist from server', 'info')
-        return
-      }
+      const nextPlaylists = playlistItems.filter((item) => item.name !== name)
+      setPlaylistItems(nextPlaylists)
       setDownloadedPlaylists((prev) => prev.filter((item) => item !== name))
-      const refreshed = await fetchPlaylists(activePlaylist === name ? null : activePlaylist)
-      if (!refreshed.length) {
-        setActivePlaylistTracks([])
-        setActivePage('home')
-      } else if (activePlaylist === name) {
-        setActivePage('playlist')
+
+      if (activePlaylist === name) {
+        const fallbackPlaylist = nextPlaylists[0]?.name ?? ''
+        setActivePlaylist(fallbackPlaylist)
+        if (!fallbackPlaylist) {
+          setActivePlaylistTracks([])
+          setActivePage('home')
+        } else {
+          setActivePage('playlist')
+        }
       }
 
       addToast(`Deleted "${name}"`, 'info')
     },
-    [activePlaylist, addToast, fetchPlaylists, playlistByName, setActivePage],
+    [activePlaylist, addToast, playlistByName, playlistItems, setActivePage],
   )
 
   const handleRequestDeletePlaylist = useCallback((name) => {

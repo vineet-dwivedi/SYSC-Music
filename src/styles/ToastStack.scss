@@ -43,6 +43,7 @@
 
 .toast__message {
   line-height: 1.4;
+  color: black;
 }
 
 .toast__close {
@@ -91,7 +92,7 @@
   .toast-stack {
     left: 14px;
     right: 14px;
-    bottom: 100px;
+    bottom: 10px;
   }
 
   .toast {
@@ -102,7 +103,7 @@
 
 @media (max-width: 480px) {
   .toast-stack {
-    bottom: 88px;
+    top: 2px;
   }
 }
 
