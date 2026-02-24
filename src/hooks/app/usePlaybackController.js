@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import api from '../../services/api.js'
+import api, { getWithFallback } from '../../services/api.js'
 import {
   clamp,
   formatTime,
@@ -64,7 +64,7 @@ function usePlaybackController({ addToast }) {
 
     const fetchTracks = async () => {
       try {
-        const res = await api.get('/tracks')
+        const res = await getWithFallback('/tracks')
         const normalized = normalizeTracks(res.data)
         setTracks(normalized)
         setQueue(normalized)
@@ -76,7 +76,8 @@ function usePlaybackController({ addToast }) {
         setTracks((prev) => mergeDurationMap(prev, durationMap))
         setQueue((prev) => mergeDurationMap(prev, durationMap))
       } catch (err) {
-        console.error('API failed, start backend at http://localhost:5000', err)
+        const activeBase = api.defaults.baseURL ?? 'unknown'
+        console.error(`API failed (base: ${activeBase})`, err)
         setTracks([])
         setQueue([])
       }

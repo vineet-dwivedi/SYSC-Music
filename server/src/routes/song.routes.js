@@ -35,7 +35,12 @@ const toAbsoluteUrl = (value, req) => {
 
 router.get('/', async (req, res) => {
   try {
-    const songs = await Song.find().sort({ createdAt: -1 }).lean();
+    const songs = await Song.find(
+      {},
+      'title artist coverImage audioUrl duration album genre playlistId createdAt',
+    )
+      .sort({ createdAt: -1 })
+      .lean();
     const normalized = songs.map((song) => ({
       id: song._id,
       title: song.title,
@@ -47,6 +52,7 @@ router.get('/', async (req, res) => {
       genre: song.genre,
       playlistId: song.playlistId ?? null,
     }));
+    res.set('Cache-Control', 'public, max-age=60');
     res.json(normalized);
   } catch (err) {
     res.status(500).json({ message: err.message });

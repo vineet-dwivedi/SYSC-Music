@@ -79,6 +79,23 @@ const trackIdentity = (track) => {
 
 const durationLabelCache = new Map()
 
+const toNonNegativeInt = (value, fallback) => {
+  const parsed = Number.parseInt(value ?? '', 10)
+  if (Number.isNaN(parsed) || parsed < 0) return fallback
+  return parsed
+}
+
+const durationHydrationFlag = import.meta.env.VITE_DURATION_HYDRATION_ENABLED
+const DURATION_HYDRATION_ENABLED =
+  typeof durationHydrationFlag === 'string'
+    ? durationHydrationFlag.toLowerCase() === 'true'
+    : !import.meta.env.PROD
+const DURATION_HYDRATION_LIMIT = toNonNegativeInt(import.meta.env.VITE_DURATION_HYDRATION_LIMIT, 12)
+const DURATION_HYDRATION_CONCURRENCY = Math.max(
+  1,
+  toNonNegativeInt(import.meta.env.VITE_DURATION_HYDRATION_CONCURRENCY, 3),
+)
+
 const isMissingDuration = (value) => {
   if (Number.isFinite(value)) return value <= 0
   const normalized = typeof value === 'string' ? value.trim() : ''
@@ -117,20 +134,54 @@ const loadDurationLabel = (audioUrl) =>
     audio.src = audioUrl
   })
 
+const hydrateWithConcurrency = async (items, worker, concurrency) => {
+  const workerCount = Math.max(1, Math.min(concurrency, items.length))
+  let cursor = 0
+
+  const runWorker = async () => {
+    while (cursor < items.length) {
+      const itemIndex = cursor
+      cursor += 1
+      await worker(items[itemIndex], itemIndex)
+    }
+  }
+
+  await Promise.all(Array.from({ length: workerCount }, () => runWorker()))
+}
+
 const hydrateTrackDurations = async (tracks = []) => {
-  if (typeof document === 'undefined' || !Array.isArray(tracks) || tracks.length === 0) {
+  if (
+    !DURATION_HYDRATION_ENABLED ||
+    DURATION_HYDRATION_LIMIT === 0 ||
+    typeof document === 'undefined' ||
+    !Array.isArray(tracks) ||
+    tracks.length === 0
+  ) {
     return tracks
   }
 
-  const next = await Promise.all(
-    tracks.map(async (track) => {
-      if (!isMissingDuration(track.duration)) return track
+  const candidates = tracks
+    .map((track, index) => ({ index, track }))
+    .filter(({ track }) => isMissingDuration(track.duration))
+    .slice(0, DURATION_HYDRATION_LIMIT)
+
+  if (!candidates.length) return tracks
+
+  const durationByIndex = new Map()
+  await hydrateWithConcurrency(
+    candidates,
+    async ({ index, track }) => {
       const label = await loadDurationLabel(track.audioUrl)
-      return { ...track, duration: label }
-    }),
+      durationByIndex.set(index, label)
+    },
+    DURATION_HYDRATION_CONCURRENCY,
   )
 
-  return next
+  return tracks.map((track, index) => {
+    const label = durationByIndex.get(index)
+    if (!label) return track
+    return { ...track, duration: label }
+  })
 }
 
 const mergeDurationMap = (tracks = [], durationMap = new Map()) =>

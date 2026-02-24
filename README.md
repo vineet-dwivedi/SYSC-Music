@@ -7,6 +7,10 @@ It includes animated UI flows, music playback controls, search, local library ma
 ## Live URLs
 
 - Frontend: `https://sysc-music.vercel.app`
+<<<<<<< HEAD
+=======
+- Backend API base: `https://sysc-music.onrender.com/api`
+>>>>>>> e9a68d3 (Backend Issues Resolve)
 
 ## Features
 
@@ -96,12 +100,26 @@ Optional frontend variable in root `.env`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
+<<<<<<< HEAD
+=======
+VITE_DURATION_HYDRATION_ENABLED=false
+VITE_DURATION_HYDRATION_LIMIT=12
+VITE_DURATION_HYDRATION_CONCURRENCY=3
+>>>>>>> e9a68d3 (Backend Issues Resolve)
 ```
 
 If not set, frontend defaults to:
 - `http://localhost:5000/api` in development
 - `https://sysc-music.onrender.com/api` in production
 
+<<<<<<< HEAD
+=======
+Duration hydration defaults:
+- Development: enabled
+- Production: disabled
+- Set `VITE_DURATION_HYDRATION_ENABLED=true` only if you need duration labels preloaded.
+
+>>>>>>> e9a68d3 (Backend Issues Resolve)
 ### 3) Run the app locally
 
 Run backend (terminal 1):
@@ -154,6 +172,16 @@ Base URL (local): `http://localhost:5000/api`
 - The frontend currently consumes `GET /api/tracks` for playback data.
 - Frontend playlist state is stored in local storage (`sysc.playlists.v1`) and is not yet wired to backend playlist APIs.
 
+<<<<<<< HEAD
+=======
+## Performance Tips
+
+- Free-tier Render services can sleep when idle; first request can take tens of seconds due to cold start.
+- Keep MongoDB and Render region close (same cloud region) to reduce startup latency.
+- If backend feels slow on first open, move to Render paid instance or add an uptime ping job.
+- Avoid preloading metadata for all tracks in production when your library is large.
+
+>>>>>>> e9a68d3 (Backend Issues Resolve)
 ## Author
 
 Vineet Dwivedi
