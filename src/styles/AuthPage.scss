@@ -15,6 +15,18 @@
     linear-gradient(145deg, #02050c 0%, #060d19 52%, #050912 100%);
 }
 
+.auth-page::before {
+  content: '';
+  position: absolute;
+  inset: -22%;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    radial-gradient(640px 340px at 20% 30%, rgba(122, 252, 255, 0.18), transparent 70%),
+    radial-gradient(640px 360px at 80% 70%, rgba(255, 156, 209, 0.16), transparent 72%);
+  animation: authAuraDrift 16s ease-in-out infinite alternate;
+}
+
 .auth-page__grid {
   position: absolute;
   inset: 0;
@@ -25,6 +37,7 @@
     linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image: radial-gradient(circle at center, black 12%, transparent 76%);
+  animation: authGridDrift 22s linear infinite;
 }
 
 .auth-page__glow {
@@ -41,12 +54,14 @@
   left: -120px;
   top: -120px;
   background: rgba(72, 214, 255, 0.55);
+  animation: authGlowFloatLeft 11s ease-in-out infinite;
 }
 
 .auth-page__glow--right {
   right: -120px;
   bottom: -120px;
   background: rgba(255, 103, 149, 0.5);
+  animation: authGlowFloatRight 12.5s ease-in-out infinite;
 }
 
 .auth-card {
@@ -54,6 +69,7 @@
   z-index: 1;
   width: min(560px, 100%);
   padding: clamp(24px, 3.5vw, 38px);
+  overflow: hidden;
 
   border-radius: 30px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -72,6 +88,25 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  animation: authCardFloat 8.5s ease-in-out infinite;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    rgba(122, 252, 255, 0.24),
+    rgba(122, 252, 255, 0),
+    rgba(255, 156, 209, 0.2),
+    rgba(122, 252, 255, 0.24)
+  );
+  background-size: 220% 220%;
+  opacity: 0.3;
+  animation: authCardShimmer 6.8s linear infinite;
 }
 
 .auth-card__badge {
@@ -84,6 +119,7 @@
   color: rgba(224, 246, 255, 0.95);
   background: rgba(122, 252, 255, 0.15);
   border: 1px solid rgba(122, 252, 255, 0.3);
+  animation: authBadgePulse 2.8s ease-in-out infinite;
 }
 
 .auth-card__title {
@@ -99,6 +135,7 @@
 
 .auth-switch {
   margin-top: 4px;
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
@@ -106,6 +143,17 @@
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.auth-switch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 22%, rgba(255, 255, 255, 0.08) 50%, transparent 78%);
+  transform: translateX(-115%);
+  animation: authSwitchSweep 4.2s ease-in-out infinite;
 }
 
 .auth-switch__item {
@@ -124,6 +172,7 @@
   color: #091520;
   background: linear-gradient(90deg, #7afcff, #8cb9ff, #ff9cd1);
   box-shadow: 0 10px 24px rgba(96, 182, 255, 0.35);
+  animation: authActiveTabPulse 2.5s ease-in-out infinite;
 }
 
 .auth-feedback {
@@ -222,6 +271,15 @@
   min-height: 56px;
 }
 
+.auth-social__google-shell {
+  position: relative;
+  width: fit-content;
+  padding: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(122, 252, 255, 0.14), rgba(255, 156, 209, 0.14));
+  animation: authSocialPulse 3.1s ease-in-out infinite;
+}
+
 .auth-social__google {
   min-height: 42px;
 }
@@ -235,6 +293,121 @@
 .auth-social__hint code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   color: #d4f6ff;
+}
+
+@keyframes authAuraDrift {
+  0% {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(2%, 1.2%, 0) scale(1.07);
+  }
+}
+
+@keyframes authGridDrift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(42px, 42px, 0);
+  }
+}
+
+@keyframes authGlowFloatLeft {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(34px, 24px, 0) scale(1.08);
+  }
+}
+
+@keyframes authGlowFloatRight {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-32px, -18px, 0) scale(1.06);
+  }
+}
+
+@keyframes authCardFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes authCardShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes authBadgePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(122, 252, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(122, 252, 255, 0);
+  }
+}
+
+@keyframes authSwitchSweep {
+  0%,
+  38% {
+    transform: translateX(-115%);
+  }
+  62% {
+    transform: translateX(115%);
+  }
+  100% {
+    transform: translateX(115%);
+  }
+}
+
+@keyframes authActiveTabPulse {
+  0%,
+  100% {
+    box-shadow: 0 10px 24px rgba(96, 182, 255, 0.35);
+  }
+  50% {
+    box-shadow: 0 12px 28px rgba(96, 182, 255, 0.52);
+  }
+}
+
+@keyframes authSocialPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.012);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page::before,
+  .auth-page__grid,
+  .auth-page__glow--left,
+  .auth-page__glow--right,
+  .auth-card,
+  .auth-card::before,
+  .auth-card__badge,
+  .auth-switch::after,
+  .auth-switch__item.is-active,
+  .auth-social__google-shell {
+    animation: none;
+  }
 }
 
 @media (max-width: 640px) {

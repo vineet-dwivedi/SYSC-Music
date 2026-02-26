@@ -1,36 +1,79 @@
-# SYSC - Full Stack Music Streaming App
+# 🎵 SYSC Music
 
-SYSC is a full-stack music streaming project with a React + Vite frontend and a Node.js + Express + MongoDB backend.
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=26&pause=1000&color=00F5D4&center=true&vCenter=true&width=700&lines=Animated+Full-Stack+Music+Streaming+App;React+%2B+Vite+%2B+Node.js+%2B+MongoDB;Google+OAuth+%7C+Playlist+Engine+%7C+Streaming+API" />
+</p>
 
-It includes animated UI flows, music playback controls, search, local library management, and API-backed track delivery.
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React%2019-61DAFB?style=for-the-badge&logo=react" />
+  <img src="https://img.shields.io/badge/Backend-Express%205-000000?style=for-the-badge&logo=express" />
+  <img src="https://img.shields.io/badge/Database-MongoDB-47A248?style=for-the-badge&logo=mongodb" />
+  <img src="https://img.shields.io/badge/Auth-Google%20OAuth-4285F4?style=for-the-badge&logo=google" />
+  <img src="https://img.shields.io/badge/Deployed-Vercel%20%7C%20Render-black?style=for-the-badge" />
+</p>
 
-## Live URLs
+## 🚀 Live Deployment
 
-- Frontend: `https://sysc-music.vercel.app`
-- Backend API base: `https://sysc-music.onrender.com/api`
+- 🌐 Frontend: `https://sysc-music.vercel.app`
+- 🔗 Backend API: `https://sysc-music.onrender.com/api`
 
-## Features
+## 📌 Overview
 
-### Frontend
+SYSC Music is a fully animated full-stack music streaming platform engineered with modern web architecture.
 
-- Animated intro and page transitions (Framer Motion)
-- Multi-page app flow: Home, Library, Album, Artist, Playlist, Profile
-- Mini player + expanded player
-- Queue playback with next/previous, seek, and add-to-queue
-- Search overlay for track discovery
-- Keyboard volume controls (`ArrowUp`, `ArrowDown`, `+`, `-`)
-- Album save/unsave and playlist creation/deletion in local storage
-- Profile edit flow and toast notifications
+It combines:
 
-### Backend API
+- High-performance React UI
+- Secure OAuth authentication
+- Normalized streaming endpoints
+- Playlist CRUD engine
+- Hardened Express API
+- Production-ready environment configuration
 
-- Track endpoints with normalized absolute media URLs
-- Playlist CRUD endpoints and playlist-track mapping endpoints
-- Media folder listing endpoint for bulk audio folders
-- Static hosting for `/public` media assets
-- Security and CORS middleware (`helmet`, `cors`)
+Designed with scalability, UX animation, and clean REST architecture in mind.
 
-## Tech Stack
+## ✨ Core Highlights
+
+### 🎬 Fully Animated UI
+
+- Intro transitions
+- Page-level motion orchestration
+- Overlay animations
+- Player state transitions
+- Auth screen motion flows
+- Built with Framer Motion + GSAP
+
+### 🔐 Authentication System
+
+- Google OAuth
+- Separate `/login` and `/register` flows
+- Explicit HTTP status enforcement:
+  - `409` -> Already registered
+  - `404` -> Not registered
+- Token-based session system
+
+### 🎵 Streaming Engine
+
+- Normalized media URLs
+- Folder-based media listing
+- Bulk media discovery endpoint
+- Cold-start resilient backend (Render-aware)
+
+### 📂 Playlist Engine
+
+- Full CRUD support
+- Track association endpoints
+- RESTful structure
+- Atomic update operations
+
+### 🛡 Security Hardening
+
+- `helmet`
+- Controlled CORS origins
+- Token validation
+- Environment isolation
+
+## 🧱 Tech Stack
 
 ### Frontend
 
@@ -50,30 +93,174 @@ It includes animated UI flows, music playback controls, search, local library ma
 - cors
 - helmet
 
-## Project Structure
+## 🏗 Project Architecture
 
 ```text
 sysc/
-  src/                      # Frontend app source
-  public/                   # Frontend static assets
+  src/                        # Frontend app
+    components/
+    hooks/
+    services/
+    styles/
+  public/
   server/
     src/
-      controllers/          # Route handlers
-      routes/               # API routes
-      models/               # Mongoose models
-      services/             # External integrations (SMS, etc.)
-      config/               # DB config
-      seed/                 # Seed scripts/assets
-    public/                 # Audio/images served by backend
+      app.js
+      server.js
+      config/
+      controllers/
+      models/
+      routes/
+      services/
+      seed/
+    public/
 ```
 
-## Getting Started
+## 🔐 Authentication Flow
 
-### Prerequisites
+### Frontend Routes
 
-- Node.js 20+
-- npm
-- MongoDB instance (local or Atlas)
+- `/login`
+- `/register`
+
+### Backend Endpoint
+
+- `POST /api/auth/google`
+
+### Request Body
+
+```json
+{
+  "credential": "Google ID token",
+  "mode": "login | register"
+}
+```
+
+### Behavior Matrix
+
+| Mode | Account Exists | Result |
+| --- | --- | --- |
+| register | Yes | 409 |
+| login | No | 404 |
+| success | - | Returns token + user object |
+
+### Response Payload
+
+```json
+{
+  "token": "...",
+  "user": {
+    "id": "",
+    "name": "",
+    "email": "",
+    "avatarUrl": "",
+    "authProvider": ""
+  }
+}
+```
+
+## 📡 API Overview
+
+Base (Local): `http://localhost:5000/api`
+
+### Tracks
+
+- `GET /tracks`
+- `GET /songs`
+
+### Playlists
+
+- `GET /playlists`
+- `POST /playlists`
+- `GET /playlists/:playlistId`
+- `PATCH /playlists/:playlistId`
+- `DELETE /playlists/:playlistId`
+
+### Playlist Tracks
+
+- `GET /playlists/:playlistId/tracks`
+- `POST /playlists/:playlistId/tracks`
+- `DELETE /playlists/:playlistId/tracks/:trackId`
+
+### Media
+
+- `GET /media/songs?folder=<folderName>`
+
+### Authentication
+
+- `POST /auth/google`
+
+## ⚙ Environment Variables
+
+### Backend (`server/.env`)
+
+Required:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+```
+
+Common:
+
+```env
+PORT=5000
+CORS_ORIGINS=http://localhost:5173,https://sysc-music.vercel.app
+FRONTEND_URL=http://localhost:5173
+```
+
+Performance tuning:
+
+```env
+MONGO_MAX_POOL_SIZE=25
+MONGO_MIN_POOL_SIZE=2
+MONGO_SERVER_SELECTION_TIMEOUT_MS=10000
+MONGO_SOCKET_TIMEOUT_MS=45000
+MONGO_MAX_IDLE_TIME_MS=30000
+TRACKS_CACHE_TTL_MS=30000
+PLAYLISTS_CACHE_TTL_MS=30000
+```
+
+### Frontend (`.env.local`)
+
+Required:
+
+```env
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+```
+
+Optional:
+
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
+VITE_DURATION_HYDRATION_ENABLED=false
+VITE_DURATION_HYDRATION_LIMIT=12
+VITE_DURATION_HYDRATION_CONCURRENCY=3
+```
+
+## 🧠 Google OAuth Setup
+
+If you encounter:
+
+- `403`
+- `GSI_LOGGER: The given origin is not allowed`
+
+Add these origins inside Google Cloud Console:
+
+- `http://localhost:5173`
+- `http://127.0.0.1:5173`
+- `https://sysc-music.vercel.app`
+
+Steps:
+
+1. APIs & Services -> Credentials
+2. Open OAuth 2.0 Client ID
+3. Add Authorized JavaScript Origins
+4. Save
+
+Propagation may take a few minutes.
+
+## 💻 Local Development
 
 ### 1) Install dependencies
 
@@ -82,110 +269,45 @@ npm install
 cd server && npm install
 ```
 
-### 2) Configure environment variables
-
-Create `server/.env`:
-
-```env
-MONGO_URI=your_mongodb_connection_string
-PORT=5000
-CORS_ORIGINS=http://localhost:5173
-FRONTEND_URL=http://localhost:5173
-GOOGLE_CLIENT_ID=your_google_oauth_client_id
-
-# OTP/SMS (Twilio)
-OTP_SMS_PROVIDER=twilio
-TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_FROM_NUMBER=+1xxxxxxxxxx
-OTP_DEFAULT_COUNTRY_CODE=+91
-```
-
-`MONGO_URI` is required. Other values are optional.
-
-Optional frontend variable in root `.env`:
-
-```env
-VITE_API_BASE_URL=http://localhost:5000/api
-VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
-
-# optional playback hydration
-VITE_DURATION_HYDRATION_ENABLED=false
-VITE_DURATION_HYDRATION_LIMIT=12
-VITE_DURATION_HYDRATION_CONCURRENCY=3
-```
-
-If not set, frontend defaults to:
-- `http://localhost:5000/api` in development
-- `https://sysc-music.onrender.com/api` in production
-
-Duration hydration defaults:
-- Development: enabled
-- Production: disabled
-- Set `VITE_DURATION_HYDRATION_ENABLED=true` only if you need duration labels preloaded.
-
-### 3) Run the app locally
-
-Run backend (terminal 1):
+### 2) Run backend
 
 ```bash
 cd server
 npm run dev
 ```
 
-Run frontend (terminal 2, repo root):
+### 3) Run frontend
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+Open `http://localhost:5173`
 
-## Scripts
+## 📜 Available Scripts
 
-### Root (frontend)
+### Root
 
-- `npm run dev` - Start Vite dev server
-- `npm run build` - Production build
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`
 
-### `server/` (backend)
+### Server
 
-- `npm run dev` - Start backend with nodemon
-- `npm run start` - Start backend with Node.js
-- `npm run seed` - Seed songs collection (update media paths as needed)
+- `npm run dev`
+- `npm run start`
+- `npm run seed`
 
-## API Overview
+## 📦 Production Notes
 
-Base URL (local): `http://localhost:5000/api`
+- Session stored in:
+  - `localStorage -> sysc.auth.session.v1`
+- Default API:
+  - Dev -> `http://localhost:5000/api`
+  - Prod -> `https://sysc-music.onrender.com/api`
+- Render free tier may cold start after inactivity.
 
-- `GET /tracks` (alias: `GET /songs`) - Fetch all tracks
-- `GET /playlists` - Fetch playlists
-- `POST /playlists` - Create playlist
-- `GET /playlists/:playlistId` - Fetch playlist by ID
-- `PATCH /playlists/:playlistId` - Update playlist metadata
-- `DELETE /playlists/:playlistId` - Delete playlist
-- `GET /playlists/:playlistId/tracks` - Fetch playlist tracks
-- `POST /playlists/:playlistId/tracks` - Add track(s) to playlist
-- `DELETE /playlists/:playlistId/tracks/:trackId` - Remove track from playlist
-- `GET /media/songs?folder=bulk-800` - List audio files from a folder
-- `POST /auth/google` - Login with Google token credential
-- `POST /auth/mobile/register/request-otp` - Send mobile OTP for registration
-- `POST /auth/mobile/register/verify-otp` - Verify registration OTP and create user
-- `POST /auth/mobile/login/request-otp` - Send OTP to registered mobile
-- `POST /auth/mobile/login/verify-otp` - Verify login OTP and authenticate user
-
-## Notes
-
-- The frontend currently consumes `GET /api/tracks` for playback data.
-- Frontend playlist state is stored in local storage (`sysc.playlists.v1`) and is not yet wired to backend playlist APIs.
-## Performance Tips
-
-- Free-tier Render services can sleep when idle; first request can take tens of seconds due to cold start.
-- Keep MongoDB and Render region close (same cloud region) to reduce startup latency.
-- If backend feels slow on first open, move to Render paid instance or add an uptime ping job.
-- Avoid preloading metadata for all tracks in production when your library is large.
-## Author
+## 👨‍💻 Author
 
 Vineet Dwivedi

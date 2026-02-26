@@ -1,8 +1,54 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { loginWithGoogle } from '../../services/auth.js'
 
 const GOOGLE_SCRIPT_ID = 'google-identity-services'
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 22, scale: 0.985 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 0.61, 0.36, 1],
+      when: 'beforeChildren',
+      staggerChildren: 0.06,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.22, 0.61, 0.36, 1] },
+  },
+}
+
+const modeTextVariants = {
+  initial: { opacity: 0, y: 8, filter: 'blur(6px)' },
+  animate: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.36, ease: [0.22, 0.61, 0.36, 1] },
+  },
+  exit: { opacity: 0, y: -8, filter: 'blur(6px)', transition: { duration: 0.2 } },
+}
+
+const feedbackVariants = {
+  initial: { opacity: 0, y: -8, scale: 0.99 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.25, ease: [0.22, 0.61, 0.36, 1] },
+  },
+  exit: { opacity: 0, y: -6, scale: 0.99, transition: { duration: 0.18 } },
+}
 
 const extractErrorMessage = (error) => {
   const status = Number(error?.response?.status || 0)
@@ -155,10 +201,7 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
   }, [clearFeedback, mode])
 
   const subtitle = useMemo(
-    () =>
-      isLoginMode
-        ? 'Continue with Google'
-        : 'Create your account with Google',
+    () => (isLoginMode ? 'Continue with Google' : 'Create your account with Google'),
     [isLoginMode],
   )
 
@@ -170,52 +213,114 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
 
       <motion.div
         className="auth-card"
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: [0.22, 0.61, 0.36, 1] }}
+        initial="hidden"
+        animate="visible"
+        variants={cardVariants}
       >
-        <p className="auth-card__badge">SYSC ACCESS</p>
-        <h1 className="auth-card__title">{isLoginMode ? 'Welcome back' : 'Create account'}</h1>
-        <p className="auth-card__subtitle">{subtitle}</p>
+        <motion.p className="auth-card__badge" variants={itemVariants}>
+          SYSC ACCESS
+        </motion.p>
 
-        <div className="auth-switch" role="tablist" aria-label="Authentication mode">
-          <button
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={`title-${mode}`}
+            className="auth-card__title"
+            variants={modeTextVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {isLoginMode ? 'Welcome back' : 'Create account'}
+          </motion.h1>
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={`subtitle-${mode}`}
+            className="auth-card__subtitle"
+            variants={modeTextVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {subtitle}
+          </motion.p>
+        </AnimatePresence>
+
+        <motion.div className="auth-switch" role="tablist" aria-label="Authentication mode" variants={itemVariants}>
+          <motion.button
             type="button"
             role="tab"
             aria-selected={isLoginMode}
             className={`auth-switch__item ${isLoginMode ? 'is-active' : ''}`}
             onClick={() => onModeChange('login')}
+            whileHover={{ y: -1, scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
           >
             Login
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             role="tab"
             aria-selected={!isLoginMode}
             className={`auth-switch__item ${!isLoginMode ? 'is-active' : ''}`}
             onClick={() => onModeChange('register')}
+            whileHover={{ y: -1, scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
           >
             Register
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
-        {statusMessage ? <p className="auth-feedback auth-feedback--success">{statusMessage}</p> : null}
-        {errorMessage ? <p className="auth-feedback auth-feedback--error">{errorMessage}</p> : null}
+        <AnimatePresence mode="popLayout">
+          {statusMessage ? (
+            <motion.p
+              key="auth-status"
+              className="auth-feedback auth-feedback--success"
+              variants={feedbackVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {statusMessage}
+            </motion.p>
+          ) : null}
+          {errorMessage ? (
+            <motion.p
+              key="auth-error"
+              className="auth-feedback auth-feedback--error"
+              variants={feedbackVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              {errorMessage}
+            </motion.p>
+          ) : null}
+        </AnimatePresence>
 
-        <div className="auth-social">
-          {googleClientId ? <div className="auth-social__google" ref={googleButtonRef} /> : null}
+        <motion.div className="auth-social" variants={itemVariants}>
+          {googleClientId ? (
+            <motion.div className="auth-social__google-shell" variants={itemVariants}>
+              <div className="auth-social__google" ref={googleButtonRef} />
+            </motion.div>
+          ) : null}
           {!googleClientId ? (
-            <p className="auth-social__hint">
+            <motion.p className="auth-social__hint" variants={itemVariants}>
               Set <code>VITE_GOOGLE_CLIENT_ID</code> in frontend env to enable Google login.
-            </p>
+            </motion.p>
           ) : null}
           {googleClientId && !googleReady ? (
-            <p className="auth-social__hint">Loading Google sign-in...</p>
+            <motion.p className="auth-social__hint" variants={itemVariants}>
+              Loading Google sign-in...
+            </motion.p>
           ) : null}
           {activeAction === 'google-login' ? (
-            <p className="auth-social__hint">Signing in with Google...</p>
+            <motion.p className="auth-social__hint" variants={itemVariants}>
+              Signing in with Google...
+            </motion.p>
           ) : null}
-        </div>
+        </motion.div>
       </motion.div>
     </section>
   )
