@@ -7,10 +7,7 @@ It includes animated UI flows, music playback controls, search, local library ma
 ## Live URLs
 
 - Frontend: `https://sysc-music.vercel.app`
-<<<<<<< HEAD
-=======
 - Backend API base: `https://sysc-music.onrender.com/api`
->>>>>>> e9a68d3 (Backend Issues Resolve)
 
 ## Features
 
@@ -61,8 +58,10 @@ sysc/
   public/                   # Frontend static assets
   server/
     src/
+      controllers/          # Route handlers
       routes/               # API routes
       models/               # Mongoose models
+      services/             # External integrations (SMS, etc.)
       config/               # DB config
       seed/                 # Seed scripts/assets
     public/                 # Audio/images served by backend
@@ -92,6 +91,14 @@ MONGO_URI=your_mongodb_connection_string
 PORT=5000
 CORS_ORIGINS=http://localhost:5173
 FRONTEND_URL=http://localhost:5173
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+
+# OTP/SMS (Twilio)
+OTP_SMS_PROVIDER=twilio
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_FROM_NUMBER=+1xxxxxxxxxx
+OTP_DEFAULT_COUNTRY_CODE=+91
 ```
 
 `MONGO_URI` is required. Other values are optional.
@@ -100,26 +107,23 @@ Optional frontend variable in root `.env`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
-<<<<<<< HEAD
-=======
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+
+# optional playback hydration
 VITE_DURATION_HYDRATION_ENABLED=false
 VITE_DURATION_HYDRATION_LIMIT=12
 VITE_DURATION_HYDRATION_CONCURRENCY=3
->>>>>>> e9a68d3 (Backend Issues Resolve)
 ```
 
 If not set, frontend defaults to:
 - `http://localhost:5000/api` in development
 - `https://sysc-music.onrender.com/api` in production
 
-<<<<<<< HEAD
-=======
 Duration hydration defaults:
 - Development: enabled
 - Production: disabled
 - Set `VITE_DURATION_HYDRATION_ENABLED=true` only if you need duration labels preloaded.
 
->>>>>>> e9a68d3 (Backend Issues Resolve)
 ### 3) Run the app locally
 
 Run backend (terminal 1):
@@ -166,22 +170,22 @@ Base URL (local): `http://localhost:5000/api`
 - `POST /playlists/:playlistId/tracks` - Add track(s) to playlist
 - `DELETE /playlists/:playlistId/tracks/:trackId` - Remove track from playlist
 - `GET /media/songs?folder=bulk-800` - List audio files from a folder
+- `POST /auth/google` - Login with Google token credential
+- `POST /auth/mobile/register/request-otp` - Send mobile OTP for registration
+- `POST /auth/mobile/register/verify-otp` - Verify registration OTP and create user
+- `POST /auth/mobile/login/request-otp` - Send OTP to registered mobile
+- `POST /auth/mobile/login/verify-otp` - Verify login OTP and authenticate user
 
 ## Notes
 
 - The frontend currently consumes `GET /api/tracks` for playback data.
 - Frontend playlist state is stored in local storage (`sysc.playlists.v1`) and is not yet wired to backend playlist APIs.
-
-<<<<<<< HEAD
-=======
 ## Performance Tips
 
 - Free-tier Render services can sleep when idle; first request can take tens of seconds due to cold start.
 - Keep MongoDB and Render region close (same cloud region) to reduce startup latency.
 - If backend feels slow on first open, move to Render paid instance or add an uptime ping job.
 - Avoid preloading metadata for all tracks in production when your library is large.
-
->>>>>>> e9a68d3 (Backend Issues Resolve)
 ## Author
 
 Vineet Dwivedi

@@ -1,4 +1,4 @@
-function Topbar({ onSearchOpen, onNavigate }) {
+function Topbar({ onSearchOpen, onNavigate, onLogout }) {
   return (
     <header className="topbar">
       <button className="topbar__search" type="button" onClick={onSearchOpen}>
@@ -15,6 +15,11 @@ function Topbar({ onSearchOpen, onNavigate }) {
         <button className="ghost-button topbar__nav-button" type="button" onClick={() => onNavigate('playlist')}>
           Playlist
         </button>
+        {typeof onLogout === 'function' ? (
+          <button className="ghost-button topbar__nav-button topbar__logout-button" type="button" onClick={onLogout}>
+            Logout
+          </button>
+        ) : null}
       </nav>
     </header>
   )

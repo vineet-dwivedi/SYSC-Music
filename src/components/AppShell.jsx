@@ -134,6 +134,7 @@ function AppShell({ c }) {
         isPlaying={c.isPlaying}
         activeAlbum={c.activeAlbum}
         playbackProgress={c.progressPercent}
+        authenticatedUserName={c.authSession?.user?.name}
       />
     )
   }
@@ -154,6 +155,7 @@ function AppShell({ c }) {
               <Topbar
                 onSearchOpen={() => c.setSearchOpen(true)}
                 onNavigate={c.navigate}
+                onLogout={c.handleLogout}
               />
               <div className="page-stack">
                 <AnimatePresence mode="wait">

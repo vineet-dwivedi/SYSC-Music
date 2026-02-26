@@ -16,6 +16,7 @@ function HomePage({
   isPlaying,
   activeAlbum,
   playbackProgress,
+  authenticatedUserName,
 }) {
   const artistNames = Object.keys(artistImages)
   const artists = Array.from(
@@ -36,16 +37,21 @@ function HomePage({
       .slice(0, 2)
       .map((part) => part[0]?.toUpperCase() ?? '')
       .join('')
+  const resolvedUserName = String(authenticatedUserName ?? '').trim() || 'Listener'
 
   return (
     <section className="page page--home">
-      <div className="ambient-wave-panel glass-panel animate-fade-slide" aria-hidden="true">
+      <div className="ambient-wave-panel glass-panel animate-fade-slide">
         <div className="ambient-wave-panel__gradient" />
         <div className="ambient-wave-panel__orb ambient-wave-panel__orb--one" />
         <div className="ambient-wave-panel__orb ambient-wave-panel__orb--two" />
         <div className="ambient-wave-panel__orb ambient-wave-panel__orb--three" />
         <div className="ambient-wave-panel__sheen" />
         <span className="ambient-wave-panel__title">AMBIENT SESSION</span>
+        <div className="ambient-wave-panel__greeting">
+          <span className="ambient-wave-panel__welcome">Welcome</span>
+          <strong className="ambient-wave-panel__name">{resolvedUserName}</strong>
+        </div>
         <div className="ambient-wave-panel__veil" />
         <div className="ambient-wave-panel__glow" />
       </div>

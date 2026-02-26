@@ -27,8 +27,45 @@ const resolveImageUrl = (value) => {
   return ''
 }
 
+const PAGE_ROUTES = Object.freeze({
+  home: '/home',
+  library: '/library',
+  album: '/album',
+  artist: '/artist',
+  playlist: '/playlist',
+  profile: '/profile',
+  'profile-edit': '/profile/edit',
+})
+
+const PATH_PAGES = Object.freeze(
+  Object.entries(PAGE_ROUTES).reduce(
+    (map, [page, path]) => ({
+      ...map,
+      [path]: page,
+    }),
+    { '/': 'home' },
+  ),
+)
+
+const normalizePathname = (pathname) => {
+  if (typeof pathname !== 'string') return '/'
+  const trimmed = pathname.trim()
+  if (!trimmed) return '/'
+  return trimmed.length > 1 ? trimmed.replace(/\/+$/, '') || '/' : trimmed
+}
+
+const resolvePageFromPathname = (pathname) => {
+  const normalizedPathname = normalizePathname(pathname)
+  return PATH_PAGES[normalizedPathname] ?? 'home'
+}
+
+const resolvePathnameFromPage = (page) => PAGE_ROUTES[page] ?? PAGE_ROUTES.home
+
 function useAppController() {
-  const [activePage, setActivePage] = useState('home')
+  const [activePage, setActivePage] = useState(() => {
+    if (typeof window === 'undefined') return 'home'
+    return resolvePageFromPathname(window.location.pathname)
+  })
   const [activeArtist, setActiveArtist] = useState('')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -44,6 +81,29 @@ function useAppController() {
   })
   const [searchQuery, setSearchQuery] = useState('')
 
+  const syncPathWithPage = useCallback((page, options = {}) => {
+    if (typeof window === 'undefined') return
+    const { replace = false } = options
+    const nextPathname = resolvePathnameFromPage(page)
+    const currentPathname = normalizePathname(window.location.pathname)
+    if (currentPathname === nextPathname) return
+
+    if (replace) {
+      window.history.replaceState({ page }, '', nextPathname)
+      return
+    }
+
+    window.history.pushState({ page }, '', nextPathname)
+  }, [])
+
+  const setActivePageWithRoute = useCallback(
+    (page, options = {}) => {
+      setActivePage(page)
+      syncPathWithPage(page, options)
+    },
+    [syncPathWithPage],
+  )
+
   const { addToast, dismissToast, toasts } = useToastManager()
 
   const playback = usePlaybackController({ addToast })
@@ -51,12 +111,12 @@ function useAppController() {
     addToast,
     availableTracks: playback.tracks,
     setActiveAlbum: playback.setActiveAlbum,
-    setActivePage,
+    setActivePage: setActivePageWithRoute,
     setScrollTarget,
   })
   const profileController = useProfileController({
     addToast,
-    setActivePage,
+    setActivePage: setActivePageWithRoute,
     setScrollTarget,
   })
 
@@ -123,10 +183,10 @@ function useAppController() {
     profileDraft,
   } = profileController
 
-  const navigate = useCallback((page, target = null) => {
-    setActivePage(page)
+  const navigate = useCallback((page, target = null, options = {}) => {
+    setActivePageWithRoute(page, options)
     setScrollTarget(target)
-  }, [])
+  }, [setActivePageWithRoute])
 
   const clearScrollTarget = useCallback(() => {
     setScrollTarget(null)
@@ -210,6 +270,21 @@ function useAppController() {
   }, [searchOpen])
 
   useEffect(() => {
+    if (typeof window === 'undefined') return undefined
+    const initialPage = resolvePageFromPathname(window.location.pathname)
+    syncPathWithPage(initialPage, { replace: true })
+
+    const handlePopState = () => {
+      const nextPage = resolvePageFromPathname(window.location.pathname)
+      setActivePage(nextPage)
+      setScrollTarget(null)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [syncPathWithPage])
+
+  useEffect(() => {
     const page = document.querySelector('.page')
     if (page) page.scrollTo({ top: 0, behavior: 'smooth' })
   }, [activePage])
@@ -225,19 +300,19 @@ function useAppController() {
       if (!album?.title) return
       setActiveAlbum(album.title)
       setActiveArtist('')
-      setActivePage('album')
+      setActivePageWithRoute('album')
       setScrollTarget(null)
     },
-    [setActiveAlbum],
+    [setActiveAlbum, setActivePageWithRoute],
   )
 
   const handleOpenArtist = useCallback((artistName) => {
     if (!artistName) return
     setActiveArtist(artistName)
     setActiveAlbum(null)
-    setActivePage('artist')
+    setActivePageWithRoute('artist')
     setScrollTarget(null)
-  }, [setActiveAlbum])
+  }, [setActiveAlbum, setActivePageWithRoute])
 
   const handlePlayAlbum = useCallback(
     (album, sourceTracks = tracks) => {
@@ -278,13 +353,13 @@ function useAppController() {
     (result) => {
       if (!result?.track) return
       handleSearchClose()
-      setActivePage('home')
+      setActivePageWithRoute('home')
       setScrollTarget(null)
       setActiveAlbum(null)
       setActiveArtist('')
       handlePlayTrack(result.track, tracks)
     },
-    [handleSearchClose, handlePlayTrack, tracks, setActiveAlbum, setActiveArtist],
+    [handleSearchClose, handlePlayTrack, tracks, setActiveAlbum, setActiveArtist, setActivePageWithRoute],
   )
 
   const handleToggleSetting = useCallback(

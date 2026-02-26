@@ -5,7 +5,7 @@ const LOCAL_API_BASE = "http://localhost:5000/api";
 
 const FALLBACK_API_BASE = import.meta.env.PROD
   ? REMOTE_API_BASE
-  : REMOTE_API_BASE;
+  : LOCAL_API_BASE;
 
 const resolveApiBase = () => {
   const raw = (import.meta.env.VITE_API_BASE_URL || FALLBACK_API_BASE).trim();
@@ -24,21 +24,22 @@ const getApiBaseCandidates = () => {
   }
 
   if (import.meta.env.PROD) return [REMOTE_API_BASE];
-  return [REMOTE_API_BASE, LOCAL_API_BASE];
+  return [LOCAL_API_BASE, REMOTE_API_BASE];
 };
 
 const api = axios.create({
   baseURL: getApiBaseCandidates()[0],
 });
 
-const getWithFallback = async (url, config = {}) => {
+const requestWithFallback = async (requestFn, options = {}) => {
+  const { retryOnStatuses = [] } = options;
   const bases = getApiBaseCandidates();
   let lastError;
 
   for (let i = 0; i < bases.length; i += 1) {
     const baseURL = bases[i];
     try {
-      const response = await api.get(url, { ...config, baseURL });
+      const response = await requestFn(baseURL);
       if (api.defaults.baseURL !== baseURL) {
         api.defaults.baseURL = baseURL;
       }
@@ -46,7 +47,9 @@ const getWithFallback = async (url, config = {}) => {
     } catch (error) {
       lastError = error;
       const isNetworkError = !error?.response && error?.code === "ERR_NETWORK";
-      const shouldRetry = isNetworkError && i < bases.length - 1;
+      const status = Number(error?.response?.status || 0);
+      const isRetryableStatus = retryOnStatuses.includes(status);
+      const shouldRetry = (isNetworkError || isRetryableStatus) && i < bases.length - 1;
       if (!shouldRetry) throw error;
     }
   }
@@ -54,5 +57,10 @@ const getWithFallback = async (url, config = {}) => {
   throw lastError;
 };
 
-export { getWithFallback };
+const getWithFallback = async (url, config = {}) =>
+  requestWithFallback((baseURL) => api.get(url, { ...config, baseURL }), {
+    retryOnStatuses: [500, 502, 503, 504],
+  });
+
+export { getApiBaseCandidates, getWithFallback, requestWithFallback };
 export default api;

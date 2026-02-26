@@ -112,6 +112,16 @@
   flex-shrink: 0;
 }
 
+.topbar__logout-button {
+  border-color: rgba(255, 168, 194, 0.42);
+  color: rgba(255, 226, 235, 0.95);
+  background: rgba(255, 108, 160, 0.16);
+}
+
+.topbar__logout-button:hover {
+  background: rgba(255, 124, 176, 0.26);
+}
+
 
 .ghost-button {
   height: 40px;
@@ -267,7 +277,7 @@
   .topbar__actions {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
     gap: 8px;
   }
 

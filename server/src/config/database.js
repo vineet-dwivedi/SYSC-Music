@@ -10,11 +10,18 @@ const connectDB = async () => {
     throw new Error('MONGO_URI is missing');
   }
 
+  const maxPoolSize = Number(process.env.MONGO_MAX_POOL_SIZE) || 25;
+  const minPoolSize = Number(process.env.MONGO_MIN_POOL_SIZE) || 2;
+  const serverSelectionTimeoutMS = Number(process.env.MONGO_SERVER_SELECTION_TIMEOUT_MS) || 10000;
+  const socketTimeoutMS = Number(process.env.MONGO_SOCKET_TIMEOUT_MS) || 45000;
+  const maxIdleTimeMS = Number(process.env.MONGO_MAX_IDLE_TIME_MS) || 30000;
+
   cachedConnection = mongoose.connect(uri, {
-    maxPoolSize: 10,
-    minPoolSize: 1,
-    serverSelectionTimeoutMS: 10000,
-    socketTimeoutMS: 45000,
+    maxPoolSize,
+    minPoolSize,
+    serverSelectionTimeoutMS,
+    socketTimeoutMS,
+    maxIdleTimeMS,
     family: 4,
   });
 

@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import songRoutes from './routes/song.routes.js';
 import playlistRoutes from './routes/playlist.routes.js';
 import mediaRoutes from './routes/media.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -13,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const rootPublicDir = path.join(__dirname, '../public');
 const app = express();
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const normalizeOrigin = (value) => value.trim().replace(/\/+$/, '');
 
@@ -61,6 +62,7 @@ app.set('trust proxy', 1);
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   }),
 );
 app.use(cors(corsOptions));
@@ -71,6 +73,7 @@ app.use('/api/songs', songRoutes);
 app.use('/api/tracks', songRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/media', mediaRoutes);
+app.use('/api/auth', authRoutes);
 app.use(
   '/public',
   express.static(rootPublicDir, {
