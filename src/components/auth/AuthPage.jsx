@@ -156,8 +156,9 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
     }
 
     let isCancelled = false
-    let resizeObserver = null
     let resizeRafId = 0
+    let lastRenderedWidth = 0
+    let removeResizeListener = () => {}
 
     const setup = async () => {
       try {
@@ -178,8 +179,11 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
 
         const renderGoogleButton = () => {
           if (!target || !window.google?.accounts?.id) return
-          const containerWidth = Math.round(target.getBoundingClientRect().width || 0)
+          const host = target.parentElement ?? target
+          const containerWidth = Math.round(host.getBoundingClientRect().width || 0)
           const width = Math.max(220, Math.min(340, containerWidth || 320))
+          if (Math.abs(width - lastRenderedWidth) < 2) return
+          lastRenderedWidth = width
 
           target.innerHTML = ''
           window.google.accounts.id.renderButton(target, {
@@ -193,16 +197,16 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
 
         renderGoogleButton()
 
-        if (typeof window.ResizeObserver === 'function') {
-          resizeObserver = new window.ResizeObserver(() => {
-            if (resizeRafId) window.cancelAnimationFrame(resizeRafId)
-            resizeRafId = window.requestAnimationFrame(() => {
-              renderGoogleButton()
-            })
+        const handleResize = () => {
+          if (resizeRafId) window.cancelAnimationFrame(resizeRafId)
+          resizeRafId = window.requestAnimationFrame(() => {
+            renderGoogleButton()
           })
-          resizeObserver.observe(target)
         }
-
+        window.addEventListener('resize', handleResize, { passive: true })
+        removeResizeListener = () => {
+          window.removeEventListener('resize', handleResize)
+        }
         setGoogleReady(true)
       } catch {
         if (isCancelled) return
@@ -214,8 +218,8 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
 
     return () => {
       isCancelled = true
-      if (resizeObserver) resizeObserver.disconnect()
       if (resizeRafId) window.cancelAnimationFrame(resizeRafId)
+      removeResizeListener()
     }
   }, [googleClientId, handleGoogleCredential, mode])
 
