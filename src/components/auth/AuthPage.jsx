@@ -245,9 +245,10 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
         animate="visible"
         variants={cardVariants}
       >
-        <motion.p className="auth-card__badge" variants={itemVariants}>
-          SYSC ACCESS
-        </motion.p>
+        <motion.div className="auth-card__brand" variants={itemVariants}>
+          <img className="auth-card__logo" src="/sysc-logo.svg" alt="SYSC Music logo" width="34" height="34" />
+          <p className="auth-card__badge">SYSC ACCESS</p>
+        </motion.div>
 
         <AnimatePresence mode="wait">
           <motion.h1

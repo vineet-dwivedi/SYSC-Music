@@ -94,6 +94,22 @@
   animation: authCardBreath 7s ease-in-out infinite;
 }
 
+.auth-card__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+}
+
+.auth-card__logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(122, 252, 255, 0.22);
+}
+
 .auth-card::before {
   content: '';
   position: absolute;

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">SYSC Music Logo</title>
+  <desc id="desc">Neon gradient logo mark for SYSC Music</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050b1a" />
+      <stop offset="100%" stop-color="#101c3b" />
+    </linearGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#63f0ff" />
+      <stop offset="55%" stop-color="#74b2ff" />
+      <stop offset="100%" stop-color="#ff85cb" />
+    </linearGradient>
+    <linearGradient id="wave" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#7afcff" />
+      <stop offset="55%" stop-color="#8cb9ff" />
+      <stop offset="100%" stop-color="#ff9cd1" />
+    </linearGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="24" y="24" width="464" height="464" rx="120" fill="url(#bg)" />
+  <rect
+    x="36"
+    y="36"
+    width="440"
+    height="440"
+    rx="108"
+    fill="none"
+    stroke="url(#ring)"
+    stroke-opacity=".42"
+    stroke-width="4"
+  />
+
+  <circle cx="256" cy="256" r="142" fill="none" stroke="url(#ring)" stroke-opacity=".2" stroke-width="20" />
+  <circle cx="256" cy="256" r="120" fill="none" stroke="url(#ring)" stroke-opacity=".4" stroke-width="2" />
+
+  <path
+    d="M334 171C307 152 264 148 228 162C193 176 177 205 193 229C211 256 255 257 285 270C312 282 314 311 290 328C263 348 216 347 178 328"
+    fill="none"
+    stroke="url(#wave)"
+    stroke-linecap="round"
+    stroke-width="30"
+    filter="url(#softGlow)"
+  />
+
+  <circle cx="186" cy="327" r="10" fill="#7afcff" />
+  <circle cx="330" cy="172" r="10" fill="#ff9cd1" />
+</svg>
