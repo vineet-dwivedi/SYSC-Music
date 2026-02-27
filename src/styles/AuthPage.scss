@@ -88,7 +88,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  animation: authCardFloat 8.5s ease-in-out infinite;
+  animation: authCardBreath 7s ease-in-out infinite;
 }
 
 .auth-card::before {
@@ -268,12 +268,14 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  width: 100%;
   min-height: 56px;
 }
 
 .auth-social__google-shell {
   position: relative;
-  width: fit-content;
+  width: min(100%, 340px);
+  min-height: 54px;
   padding: 6px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(122, 252, 255, 0.14), rgba(255, 156, 209, 0.14));
@@ -281,7 +283,15 @@
 }
 
 .auth-social__google {
+  width: 100%;
   min-height: 42px;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-social__google > div,
+.auth-social__google iframe {
+  max-width: 100%;
 }
 
 .auth-social__hint {
@@ -333,13 +343,18 @@
   }
 }
 
-@keyframes authCardFloat {
+@keyframes authCardBreath {
   0%,
   100% {
-    transform: translateY(0);
+    box-shadow:
+      0 40px 80px rgba(0, 0, 0, 0.52),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
   50% {
-    transform: translateY(-4px);
+    box-shadow:
+      0 44px 88px rgba(0, 0, 0, 0.58),
+      0 0 0 1px rgba(122, 252, 255, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -388,10 +403,10 @@
 @keyframes authSocialPulse {
   0%,
   100% {
-    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(122, 252, 255, 0.18);
   }
   50% {
-    transform: scale(1.012);
+    box-shadow: 0 0 0 10px rgba(122, 252, 255, 0);
   }
 }
 

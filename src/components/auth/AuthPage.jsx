@@ -156,6 +156,8 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
     }
 
     let isCancelled = false
+    let resizeObserver = null
+    let resizeRafId = 0
 
     const setup = async () => {
       try {
@@ -165,7 +167,6 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
         const target = googleButtonRef.current
         if (!target || !window.google?.accounts?.id) return
 
-        target.innerHTML = ''
         window.google.accounts.id.initialize({
           client_id: googleClientId,
           callback: ({ credential }) => {
@@ -174,13 +175,34 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
           auto_select: false,
           cancel_on_tap_outside: true,
         })
-        window.google.accounts.id.renderButton(target, {
-          theme: 'filled_black',
-          size: 'large',
-          text: 'continue_with',
-          shape: 'pill',
-          width: 320,
-        })
+
+        const renderGoogleButton = () => {
+          if (!target || !window.google?.accounts?.id) return
+          const containerWidth = Math.round(target.getBoundingClientRect().width || 0)
+          const width = Math.max(220, Math.min(340, containerWidth || 320))
+
+          target.innerHTML = ''
+          window.google.accounts.id.renderButton(target, {
+            theme: 'filled_black',
+            size: 'large',
+            text: 'continue_with',
+            shape: 'pill',
+            width,
+          })
+        }
+
+        renderGoogleButton()
+
+        if (typeof window.ResizeObserver === 'function') {
+          resizeObserver = new window.ResizeObserver(() => {
+            if (resizeRafId) window.cancelAnimationFrame(resizeRafId)
+            resizeRafId = window.requestAnimationFrame(() => {
+              renderGoogleButton()
+            })
+          })
+          resizeObserver.observe(target)
+        }
+
         setGoogleReady(true)
       } catch {
         if (isCancelled) return
@@ -192,6 +214,8 @@ function AuthPage({ mode = 'login', onModeChange, onAuthenticated }) {
 
     return () => {
       isCancelled = true
+      if (resizeObserver) resizeObserver.disconnect()
+      if (resizeRafId) window.cancelAnimationFrame(resizeRafId)
     }
   }, [googleClientId, handleGoogleCredential, mode])
 
