@@ -83,6 +83,7 @@ Designed with scalability, UX animation, and clean REST architecture in mind.
 - Framer Motion
 - GSAP
 - Axios
+- Lucid Icons
 
 ### Backend
 
