@@ -92,6 +92,7 @@ Designed with scalability, UX animation, and clean REST architecture in mind.
 - dotenv
 - cors
 - helmet
+- multer
 
 ## 🏗 Project Architecture
 
