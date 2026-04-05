@@ -4,6 +4,8 @@ import AuthPage from './components/auth/AuthPage.jsx'
 import { useAppController } from './hooks/useAppController.js'
 
 const AUTH_STORAGE_KEY = 'sysc.auth.session.v1'
+const THEME_STORAGE_KEY = 'sysc.theme.v1'
+const DEFAULT_THEME = 'ultra'
 const LOGIN_PATH = '/login'
 const REGISTER_PATH = '/register'
 
@@ -34,6 +36,25 @@ const readStoredSession = () => {
   }
 }
 
+const resolveTheme = (value) => (value === 'midnight' ? 'midnight' : DEFAULT_THEME)
+
+const readStoredTheme = () => {
+  if (typeof window === 'undefined') return DEFAULT_THEME
+  try {
+    return resolveTheme(window.localStorage.getItem(THEME_STORAGE_KEY))
+  } catch {
+    return DEFAULT_THEME
+  }
+}
+
+const applyThemeToDocument = (theme) => {
+  if (typeof document === 'undefined') return
+  const themeColor = theme === 'midnight' ? '#0b1020' : '#f7f9ff'
+  document.documentElement.dataset.theme = theme
+  document.documentElement.style.colorScheme = theme === 'midnight' ? 'dark' : 'light'
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
+}
+
 const persistSession = (session) => {
   if (typeof window === 'undefined') return
   if (session) {
@@ -43,13 +64,30 @@ const persistSession = (session) => {
   window.localStorage.removeItem(AUTH_STORAGE_KEY)
 }
 
-function AppContent({ authSession, onLogout }) {
+const initialTheme = readStoredTheme()
+applyThemeToDocument(initialTheme)
+
+function AppContent({ authSession, onLogout, theme, themeTransition, onThemeToggle }) {
   const controller = useAppController()
-  return <AppShell c={{ ...controller, authSession, handleLogout: onLogout }} />
+
+  return (
+    <AppShell
+      c={{
+        ...controller,
+        authSession,
+        handleLogout: onLogout,
+        theme,
+        themeTransition,
+        handleThemeToggle: onThemeToggle,
+      }}
+    />
+  )
 }
 
 function App() {
   const [session, setSession] = useState(() => readStoredSession())
+  const [theme, setTheme] = useState(() => initialTheme)
+  const [themeTransition, setThemeTransition] = useState(null)
   const [authMode, setAuthMode] = useState(() => {
     if (typeof window === 'undefined') return 'login'
     return getAuthModeFromPathname(window.location.pathname)
@@ -58,6 +96,27 @@ function App() {
   useEffect(() => {
     persistSession(session)
   }, [session])
+
+  useEffect(() => {
+    applyThemeToDocument(theme)
+    if (typeof window === 'undefined') return
+
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+    } catch {
+      // Ignore storage failures and keep the in-memory theme.
+    }
+  }, [theme])
+
+  useEffect(() => {
+    if (!themeTransition || typeof window === 'undefined') return undefined
+
+    const timer = window.setTimeout(() => {
+      setThemeTransition(null)
+    }, 980)
+
+    return () => window.clearTimeout(timer)
+  }, [themeTransition])
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
@@ -106,6 +165,25 @@ function App() {
     }
   }, [])
 
+  const handleThemeToggle = useCallback((origin) => {
+    const nextTheme = theme === 'midnight' ? DEFAULT_THEME : 'midnight'
+    const fallbackOrigin = typeof window === 'undefined'
+      ? { x: 0, y: 0 }
+      : { x: window.innerWidth - 84, y: 40 }
+
+    const safeOrigin =
+      Number.isFinite(origin?.x) && Number.isFinite(origin?.y)
+        ? { x: origin.x, y: origin.y }
+        : fallbackOrigin
+
+    setTheme(nextTheme)
+    setThemeTransition({
+      id: Date.now(),
+      theme: nextTheme,
+      ...safeOrigin,
+    })
+  }, [theme])
+
   if (!session) {
     return (
       <AuthPage
@@ -116,7 +194,15 @@ function App() {
     )
   }
 
-  return <AppContent authSession={session} onLogout={handleLogout} />
+  return (
+    <AppContent
+      authSession={session}
+      onLogout={handleLogout}
+      theme={theme}
+      themeTransition={themeTransition}
+      onThemeToggle={handleThemeToggle}
+    />
+  )
 }
 
 export default App

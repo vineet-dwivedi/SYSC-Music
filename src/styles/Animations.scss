@@ -103,6 +103,54 @@
   opacity: 0.7;
 }
 
+.theme-bloom {
+  position: fixed;
+  inset: 0;
+  z-index: 1900;
+  pointer-events: none;
+  overflow: hidden;
+  background: transparent;
+}
+
+.theme-bloom::before,
+.theme-bloom__veil {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.theme-bloom::before {
+  background:
+    radial-gradient(
+      circle at var(--theme-origin-x) var(--theme-origin-y),
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(255, 255, 255, 0.26) 12%,
+      transparent 36%
+    );
+  opacity: 0.9;
+}
+
+.theme-bloom__veil {
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+}
+
+.theme-bloom--ultra {
+  background:
+    radial-gradient(circle at 18% 24%, rgba(78, 227, 255, 0.28), transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(169, 139, 255, 0.26), transparent 38%),
+    radial-gradient(circle at 72% 82%, rgba(255, 158, 201, 0.26), transparent 38%),
+    linear-gradient(140deg, rgba(255,255,255,0.72), rgba(246,251,255,0.54), rgba(255,247,240,0.46));
+}
+
+.theme-bloom--midnight {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(98, 212, 255, 0.22), transparent 34%),
+    radial-gradient(circle at 84% 18%, rgba(116, 97, 255, 0.24), transparent 36%),
+    radial-gradient(circle at 72% 84%, rgba(255, 114, 170, 0.2), transparent 38%),
+    linear-gradient(145deg, rgba(7,10,18,0.92), rgba(10,14,24,0.88), rgba(6,9,16,0.92));
+}
+
 .animate-fade-slide {
   animation: fadeSlide 0.75s cubic-bezier(.22,1,.36,1) both;
 }
@@ -136,11 +184,13 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-slide,
   .animate-card,
-  .page-credit__text {
+  .page-credit__text,
+  .theme-bloom {
     animation: none;
   }
 
-  .lens-wipe {
+  .lens-wipe,
+  .theme-bloom__veil {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }

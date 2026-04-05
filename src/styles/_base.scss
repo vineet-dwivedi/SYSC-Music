@@ -29,6 +29,9 @@ body {
 
   background: #06080d;
   color: #eaf6ff;
+  transition:
+    background 0.55s cubic-bezier(.22,1,.36,1),
+    color 0.35s ease;
 
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -191,6 +194,10 @@ svg {
   scroll-padding-top: 24px;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
+}
+
+.page.lenis {
+  scroll-behavior: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

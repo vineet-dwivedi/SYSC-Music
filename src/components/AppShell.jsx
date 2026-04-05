@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { gsap } from 'gsap'
 import AppBackground from './AppBackground.jsx'
 import Topbar from './Topbar.jsx'
 import HomePage from './pages/HomePage.jsx'
@@ -17,8 +19,44 @@ import SettingsOverlay from './overlays/SettingsOverlay.jsx'
 import IntroScreen from './intro/IntroScreen.jsx'
 import ToastStack from './ToastStack.jsx'
 import VolumeHud from './VolumeHud.jsx'
+import { usePageLenis } from '../hooks/usePageLenis.js'
 
 function AppShell({ c }) {
+  const appShellRef = useRef(null)
+  const pageStackRef = useRef(null)
+
+  usePageLenis({
+    containerRef: pageStackRef,
+    activePage: c.activePage,
+    enabled: c.introComplete,
+  })
+
+  useEffect(() => {
+    if (!c.themeTransition || typeof window === 'undefined') return undefined
+
+    const ctx = gsap.context(() => {
+      gsap.timeline()
+        .fromTo(
+          '.app__background',
+          { scale: 0.985, filter: 'saturate(1) brightness(1)' },
+          {
+            scale: 1.018,
+            filter: c.theme === 'midnight' ? 'saturate(1.2) brightness(0.92)' : 'saturate(1.08) brightness(1.05)',
+            duration: 0.34,
+            ease: 'power2.out',
+          },
+        )
+        .to('.app__background', {
+          scale: 1,
+          filter: 'saturate(1) brightness(1)',
+          duration: 0.72,
+          ease: 'power3.out',
+        })
+    }, appShellRef)
+
+    return () => ctx.revert()
+  }, [c.theme, c.themeTransition])
+
   const pageFooter = (
     <footer className="page-credit" aria-label="Copyright">
       <span className="page-credit__text">Copyright &copy; Developed By Vineet Dwivedi</span>
@@ -46,6 +84,7 @@ function AppShell({ c }) {
         />
       )
     }
+
     if (c.activePage === 'album') {
       return (
         <AlbumPage
@@ -62,6 +101,7 @@ function AppShell({ c }) {
         />
       )
     }
+
     if (c.activePage === 'artist') {
       return (
         <ArtistPage
@@ -76,6 +116,7 @@ function AppShell({ c }) {
         />
       )
     }
+
     if (c.activePage === 'playlist') {
       return (
         <PlaylistPage
@@ -94,6 +135,7 @@ function AppShell({ c }) {
         />
       )
     }
+
     if (c.activePage === 'profile') {
       return (
         <ProfilePage
@@ -107,6 +149,7 @@ function AppShell({ c }) {
         />
       )
     }
+
     if (c.activePage === 'profile-edit') {
       return (
         <EditProfilePage
@@ -118,6 +161,7 @@ function AppShell({ c }) {
         />
       )
     }
+
     return (
       <HomePage
         albums={c.albums}
@@ -144,6 +188,7 @@ function AppShell({ c }) {
       {c.introComplete ? (
         <motion.div
           key="app"
+          ref={appShellRef}
           className="app-shell"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -156,8 +201,10 @@ function AppShell({ c }) {
                 onSearchOpen={() => c.setSearchOpen(true)}
                 onNavigate={c.navigate}
                 onLogout={c.handleLogout}
+                theme={c.theme}
+                onThemeToggle={c.handleThemeToggle}
               />
-              <div className="page-stack">
+              <div className="page-stack" ref={pageStackRef}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={c.activePage}
@@ -242,6 +289,30 @@ function AppShell({ c }) {
           </div>
           <ToastStack toasts={c.toasts} onDismiss={c.dismissToast} />
           <VolumeHud value={c.volumeHudValue} isVisible={c.volumeHudVisible} />
+          <AnimatePresence>
+            {c.themeTransition ? (
+              <motion.div
+                key={`theme-${c.themeTransition.id}`}
+                className={`theme-bloom theme-bloom--${c.themeTransition.theme}`}
+                style={{
+                  '--theme-origin-x': `${c.themeTransition.x}px`,
+                  '--theme-origin-y': `${c.themeTransition.y}px`,
+                }}
+                initial={{
+                  opacity: 0.92,
+                  clipPath: `circle(0px at ${c.themeTransition.x}px ${c.themeTransition.y}px)`,
+                }}
+                animate={{
+                  opacity: 1,
+                  clipPath: `circle(160vmax at ${c.themeTransition.x}px ${c.themeTransition.y}px)`,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.9, ease: [0.22, 0.61, 0.36, 1] }}
+              >
+                <div className="theme-bloom__veil" />
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
           <AnimatePresence>
             {c.wipeActive ? (
               <motion.div

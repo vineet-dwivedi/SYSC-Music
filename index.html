@@ -6,6 +6,25 @@
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b1020" />
+    <script>
+      (() => {
+        const themeKey = 'sysc.theme.v1'
+        const defaultTheme = 'ultra'
+
+        try {
+          const storedTheme = localStorage.getItem(themeKey)
+          const safeTheme = storedTheme === 'midnight' ? 'midnight' : defaultTheme
+          const themeColor = safeTheme === 'midnight' ? '#0b1020' : '#f7f9ff'
+          document.documentElement.dataset.theme = safeTheme
+          document.documentElement.style.colorScheme = safeTheme === 'midnight' ? 'dark' : 'light'
+          document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
+        } catch {
+          document.documentElement.dataset.theme = defaultTheme
+          document.documentElement.style.colorScheme = 'light'
+          document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f7f9ff')
+        }
+      })()
+    </script>
     <title>SYSC Music</title>
   </head>
   <body>
