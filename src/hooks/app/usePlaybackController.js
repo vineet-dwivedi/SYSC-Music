@@ -22,6 +22,7 @@ function usePlaybackController({ addToast }) {
   const [volume, setVolume] = useState(0.7)
   const [volumeHudValue, setVolumeHudValue] = useState(70)
   const [volumeHudVisible, setVolumeHudVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const volumeHudTimerRef = useRef(null)
   const didFetchRef = useRef(false)
@@ -64,6 +65,7 @@ function usePlaybackController({ addToast }) {
 
     const fetchTracks = async () => {
       try {
+        setIsLoading(true)
         const res = await getWithFallback('/tracks')
         const normalized = normalizeTracks(res.data)
         setTracks(normalized)
@@ -80,6 +82,8 @@ function usePlaybackController({ addToast }) {
         console.error(`API failed (base: ${activeBase})`, err)
         setTracks([])
         setQueue([])
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchTracks()
@@ -369,6 +373,7 @@ function usePlaybackController({ addToast }) {
     handleShare,
     handleTogglePlay,
     handleVolumeChange,
+    isLoading,
     isPlaying,
     playbackDurationLabel,
     playbackTimeLabel,

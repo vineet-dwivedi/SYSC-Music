@@ -17,6 +17,7 @@ import CreatePlaylistOverlay from './overlays/CreatePlaylistOverlay.jsx'
 import DeletePlaylistOverlay from './overlays/DeletePlaylistOverlay.jsx'
 import SettingsOverlay from './overlays/SettingsOverlay.jsx'
 import IntroScreen from './intro/IntroScreen.jsx'
+import LoadingScreen from './LoadingScreen.jsx'
 import ToastStack from './ToastStack.jsx'
 import VolumeHud from './VolumeHud.jsx'
 import { usePageLenis } from '../hooks/usePageLenis.js'
@@ -327,6 +328,9 @@ function AppShell({ c }) {
                 <div className="lens-wipe__beam" />
               </motion.div>
             ) : null}
+          </AnimatePresence>
+          <AnimatePresence>
+            {c.isLoading ? <LoadingScreen /> : null}
           </AnimatePresence>
         </motion.div>
       ) : (

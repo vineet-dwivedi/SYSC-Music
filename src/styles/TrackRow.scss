@@ -104,7 +104,8 @@
 
 .track-row__artist {
   font-size: .78rem;
-  color: rgba(255,255,255,.55);
+  color: var(--artist-name);
+  opacity: .75;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

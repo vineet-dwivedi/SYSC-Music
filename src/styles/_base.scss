@@ -71,6 +71,8 @@ svg {
 
   --text: #eaf6ff;
   --text-muted: #8ea3b7;
+  --button-text: #ffffff;
+  --artist-name: #ffffff;
 
   --accent: #7afcff;
   --accent-strong: #3ec7ff;
@@ -122,7 +124,7 @@ svg {
     var(--accent-strong)
   );
 
-  color: #051015;
+  color: var(--button-text);
   font-weight: 600;
 
   box-shadow: var(--glow);
@@ -138,7 +140,7 @@ svg {
   padding: 10px 16px;
   border-radius: var(--radius-md);
 
-  color: var(--text-muted);
+  color: var(--button-text);
 
   transition: 0.2s ease;
 }
