@@ -96,6 +96,22 @@ svg {
   --blur-lg: 22px;
 }
 
+:root[data-theme='midnight'] {
+  --button-text: #ffffff;
+  --artist-name: #ffffff;
+}
+
+:root[data-theme='midnight'] .primary-button,
+:root[data-theme='midnight'] .ghost-button,
+:root[data-theme='midnight'] .text-button,
+:root[data-theme='midnight'] .primary-button:hover,
+:root[data-theme='midnight'] .ghost-button:hover,
+:root[data-theme='midnight'] .text-button:hover,
+:root[data-theme='midnight'] .artist-item__name,
+:root[data-theme='midnight'] .track-row__artist {
+  color: #ffffff !important;
+}
+
 //Glass
 .glass {
   background: var(--glass);
@@ -147,7 +163,7 @@ svg {
 
 .ghost-button:hover {
   background: var(--glass);
-  color: var(--text);
+  color: var(--button-text);
 }
 
 //Icon Button
