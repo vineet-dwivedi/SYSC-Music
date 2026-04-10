@@ -1,0 +1,130 @@
+﻿:root[data-theme='ultra'] {
+  body {
+    background:
+      radial-gradient(56% 54% at 12% 18%, rgba(78, 227, 255, 0.22), transparent 64%),
+      radial-gradient(54% 52% at 84% 14%, rgba(169, 139, 255, 0.2), transparent 66%),
+      radial-gradient(52% 50% at 78% 86%, rgba(255, 158, 201, 0.18), transparent 68%),
+      radial-gradient(46% 44% at 24% 86%, rgba(255, 201, 117, 0.17), transparent 68%),
+      radial-gradient(42% 40% at 52% 72%, rgba(151, 240, 188, 0.16), transparent 66%),
+      linear-gradient(165deg, var(--ultra-bg-0) 0%, var(--ultra-bg-1) 56%, var(--ultra-bg-2) 100%);
+    color: var(--ultra-text);
+  }
+
+  .page--home,
+  .page--library,
+  .page--playlist,
+  .page--profile,
+  .page--profile-edit {
+    background:
+      radial-gradient(56% 54% at 12% 18%, rgba(78, 227, 255, 0.2) 0%, transparent 64%),
+      radial-gradient(54% 52% at 84% 14%, rgba(169, 139, 255, 0.18) 0%, transparent 66%),
+      radial-gradient(52% 50% at 78% 86%, rgba(255, 158, 201, 0.16) 0%, transparent 68%),
+      radial-gradient(46% 44% at 24% 86%, rgba(255, 201, 117, 0.15) 0%, transparent 68%),
+      radial-gradient(42% 40% at 52% 72%, rgba(151, 240, 188, 0.14) 0%, transparent 66%),
+      linear-gradient(165deg, #fcfdff 0%, #f7f9ff 56%, #fffaf4 100%) !important;
+    color: var(--ultra-text) !important;
+  }
+
+  .app__background {
+    background:
+      radial-gradient(circle at 15% 20%, #f7fbff 0%, #f3f7ff 40%, #f8f3ff 100%) !important;
+  }
+
+  .noise {
+    opacity: 0.018 !important;
+  }
+
+  .orb--one {
+    background: radial-gradient(
+      circle,
+      rgba(78, 227, 255, 0.45) 0%,
+      rgba(78, 227, 255, 0.15) 42%,
+      transparent 70%
+    ) !important;
+  }
+
+  .orb--two {
+    background: radial-gradient(
+      circle,
+      rgba(169, 139, 255, 0.42) 0%,
+      rgba(169, 139, 255, 0.14) 42%,
+      transparent 70%
+    ) !important;
+  }
+
+  .orb--three {
+    background: radial-gradient(
+      circle,
+      rgba(255, 158, 201, 0.36) 0%,
+      rgba(255, 158, 201, 0.13) 42%,
+      transparent 72%
+    ) !important;
+  }
+
+  .glass-panel,
+  .sidebar,
+  .topbar,
+  .mini-player,
+  .overlay__panel,
+  .playlist-hero,
+  .track-list,
+  .profile-hero,
+  .profile-section,
+  .library-card,
+  .search-result,
+  .search-panel,
+  .create-playlist-panel,
+  .delete-playlist-panel,
+  .artist-scroller {
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.66),
+      rgba(255, 255, 255, 0.36)
+    ) !important;
+    border: 1px solid var(--ultra-stroke) !important;
+    backdrop-filter: blur(30px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(190%) !important;
+    box-shadow:
+      0 24px 58px rgba(43, 62, 102, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.96),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.46) !important;
+  }
+
+  .hero {
+    border: 1px solid rgba(255, 255, 255, 0.78);
+  }
+
+  .hero__glow {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.72) 0%, transparent 70%) !important;
+    opacity: 0.5 !important;
+  }
+
+  .artist-scroller {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.68), rgba(255, 255, 255, 0.34)),
+      radial-gradient(60% 110% at 0% 50%, rgba(78, 227, 255, 0.14) 0%, transparent 65%),
+      radial-gradient(60% 110% at 100% 50%, rgba(255, 158, 201, 0.13) 0%, transparent 65%) !important;
+  }
+
+  .section__head h2,
+  .page__subtitle,
+  .sidebar__text,
+  .mini-player__title,
+  .search-result__title,
+  .track-row__name,
+  .artist-item__name,
+  .page--home .track-row__artist {
+    color: var(--ultra-text) !important;
+  }
+
+  .section__hint,
+  .mini-player__artist,
+  .search-result__meta,
+  .profile-section__meta,
+  .section__empty,
+  .sidebar__label,
+  .hero__subtitle,
+  .eyebrow {
+    color: var(--ultra-muted) !important;
+  }
+}

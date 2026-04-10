@@ -1,0 +1,44 @@
+﻿.app {
+  height: 100%;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.24) transparent;
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.page.lenis {
+  scroll-behavior: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  .page {
+    scroll-behavior: auto;
+  }
+}
+
+
+
+

@@ -1,0 +1,49 @@
+﻿:root {
+  //Colors
+  --bg: #06080d;
+  --bg-soft: #0d1118;
+
+  --text: #eaf6ff;
+  --text-muted: #8ea3b7;
+  --button-text: #ffffff;
+  --artist-name: #ffffff;
+
+  --accent: #7afcff;
+  --accent-strong: #3ec7ff;
+
+  //Glass
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.1);
+  --border-soft: rgba(255, 255, 255, 0.08);
+
+  //Radius
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+
+  //Shadow
+  --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.5);
+  --glow: 0 0 24px rgba(122, 252, 255, 0.25);
+
+  //Blur
+  --blur-lg: 22px;
+}
+
+:root[data-theme='midnight'] {
+  --button-text: #ffffff;
+  --artist-name: #ffffff;
+}
+
+:root[data-theme='midnight'] .primary-button,
+:root[data-theme='midnight'] .ghost-button,
+:root[data-theme='midnight'] .text-button,
+:root[data-theme='midnight'] .primary-button:hover,
+:root[data-theme='midnight'] .ghost-button:hover,
+:root[data-theme='midnight'] .text-button:hover,
+:root[data-theme='midnight'] .artist-item__name,
+:root[data-theme='midnight'] .track-row__artist {
+  color: #ffffff !important;
+}
+
+//Glass

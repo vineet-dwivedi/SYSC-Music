@@ -1,0 +1,66 @@
+﻿*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  background: #06080d;
+  color: #eaf6ff;
+  transition:
+    background 0.55s cubic-bezier(.22,1,.36,1),
+    color 0.35s ease;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  overflow: hidden; /* app layout like OS */
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.45),
+    0 0 0 6px rgba(207,233,255,.2);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+

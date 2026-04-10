@@ -1,0 +1,72 @@
+﻿.glass {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur-lg));
+  border: 1px solid var(--border-soft);
+}
+
+//Scroller
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+//Button
+
+.primary-button {
+  padding: 12px 26px;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    var(--accent-strong)
+  );
+
+  color: var(--button-text);
+  font-weight: 600;
+
+  box-shadow: var(--glow);
+
+  transition: 0.2s ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+}
+
+.ghost-button {
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+
+  color: var(--button-text);
+
+  transition: 0.2s ease;
+}
+
+.ghost-button:hover {
+  background: var(--glass);
+  color: var(--button-text);
+}
+
+//Icon Button
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  transition: 0.2s ease;
+}
+
+.icon-button:hover {
+  background: var(--glass);
+}
+
+//Layout

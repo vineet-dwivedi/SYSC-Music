@@ -1,0 +1,158 @@
+﻿.hero {
+display: flex;
+flex-wrap: wrap;
+justify-content: space-between;
+gap: clamp(20px, 3vw, 44px);
+padding: clamp(22px, 3.8vw, 42px);
+align-items: center;
+min-height: clamp(260px, 34vw, 380px);
+position: relative;
+overflow: hidden;
+}
+
+.hero__copy {
+display: flex;
+flex-direction: column;
+gap: 18px;
+justify-content: center;
+flex: 1 1 420px;
+min-width: min(100%, 280px);
+align-items: flex-start;
+position: relative;
+z-index: 1;
+}
+
+.eyebrow {
+font-size: .78rem;
+letter-spacing: .18em;
+text-transform: uppercase;
+color: rgba(255,255,255,.55);
+}
+
+.hero h1 {
+font-size: clamp(2.4rem, 4vw, 3.6rem);
+font-weight: 650;
+letter-spacing: -.02em;
+line-height: 1.08;
+word-break: break-word;
+}
+
+.hero__subtitle {
+max-width: 58ch;
+color: rgba(255,255,255,.65);
+line-height: 1.6;
+}
+
+.hero__actions {
+display: flex;
+gap: 14px;
+flex-wrap: wrap;
+margin-top: 10px;
+}
+
+.primary-button,
+.ghost-button {
+padding: 12px 22px;
+border-radius: 999px;
+font-size: .9rem;
+cursor: pointer;
+
+transition:
+transform .3s cubic-bezier(.22,1,.36,1),
+box-shadow .3s,
+background .3s;
+}
+
+.primary-button {
+border: 1px solid rgba(255,255,255,.22);
+background: linear-gradient(120deg,#cfe9ff,#e6ddff,#ffd6e7);
+color: var(--button-text);
+font-weight: 600;
+}
+
+.primary-button:hover {
+transform: translateY(-3px) scale(1.04);
+box-shadow: 0 18px 36px rgba(0,0,0,.45);
+}
+
+.ghost-button {
+border: 1px solid rgba(255,255,255,.2);
+background: rgba(255,255,255,.08);
+color: var(--button-text);
+backdrop-filter: blur(10px);
+}
+
+.ghost-button:hover {
+transform: translateY(-2px);
+background: rgba(255,255,255,.16);
+}
+
+.page--home .ghost-button[aria-pressed="true"] {
+  background: linear-gradient(120deg,#cfe9ff,#e6ddff,#ffd6e7);
+  color: #0b0c10;
+  border-color: transparent;
+  box-shadow: 0 12px 24px rgba(0,0,0,.35);
+}
+
+.hero__stats {
+display: flex;
+gap: 30px;
+flex-wrap: wrap;
+row-gap: 12px;
+margin-top: 18px;
+}
+
+.stat__value {
+font-weight: 600;
+font-size: 1rem;
+}
+
+.stat__label {
+font-size: .75rem;
+color: rgba(255,255,255,.5);
+}
+
+.hero__art {
+position: relative;
+display: grid;
+place-items: center;
+flex: 0 1 320px;
+width: min(36vw, 320px);
+margin-inline: auto;
+z-index: 1;
+}
+
+.art--hero {
+width: clamp(180px, 22vw, 300px);
+height: clamp(180px, 22vw, 300px);
+border-radius: 30px;
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-color: rgba(255,255,255,.09);
+
+box-shadow:
+0 40px 80px rgba(0,0,0,.65);
+
+transition: transform .6s cubic-bezier(.22,1,.36,1);
+}
+
+.art--hero--fallback {
+background-image: linear-gradient(145deg, rgba(255,255,255,.2), rgba(255,255,255,.08));
+}
+
+.hero__art:hover .art--hero {
+transform: rotate(-2deg) scale(1.04);
+}
+
+.hero__glow {
+position: absolute;
+width: 360px;
+height: 360px;
+border-radius: 50%;
+background: radial-gradient(circle,#cfe9ff 0%,transparent 70%);
+filter: blur(70px);
+opacity: .35;
+z-index: -1;
+}
+

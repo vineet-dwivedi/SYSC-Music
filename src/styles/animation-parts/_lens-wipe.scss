@@ -1,0 +1,26 @@
+﻿.lens-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  transform-origin: left center;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255,255,255,0.08),
+      rgba(255,255,255,0.75),
+      rgba(255,255,255,0.08)
+    );
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+}
+
+.lens-wipe__beam {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(210,225,255,0.45), transparent 60%),
+    radial-gradient(circle at 80% 50%, rgba(255,230,245,0.4), transparent 60%);
+  opacity: 0.7;
+}
+

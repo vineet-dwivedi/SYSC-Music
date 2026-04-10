@@ -1,0 +1,39 @@
+﻿.page--home {
+position: relative;
+padding: 42px clamp(18px, 4vw, 60px) 80px;
+display: flex;
+flex-direction: column;
+gap: 42px;
+min-height: 100vh;
+overflow-x: hidden;
+
+background:
+radial-gradient(60% 50% at 10% 15%, #cfe9ff 0%, transparent 60%),
+radial-gradient(60% 50% at 90% 75%, #ffd6e7 0%, transparent 60%),
+radial-gradient(50% 50% at 60% 10%, #e6ddff 0%, transparent 60%),
+radial-gradient(50% 50% at 30% 90%, #d7ffe9 0%, transparent 60%),
+#0b0c10;
+
+color: rgba(255,255,255,.92);
+}
+
+.glass-panel {
+background: linear-gradient(
+145deg,
+rgba(255,255,255,.14),
+rgba(255,255,255,.05)
+);
+
+border: 1px solid rgba(255,255,255,.18);
+
+backdrop-filter: blur(22px) saturate(170%);
+-webkit-backdrop-filter: blur(22px) saturate(170%);
+
+box-shadow:
+0 35px 90px rgba(0,0,0,.55),
+inset 0 1px 0 rgba(255,255,255,.35),
+inset 0 -1px 0 rgba(255,255,255,.08);
+
+border-radius: 28px;
+}
+

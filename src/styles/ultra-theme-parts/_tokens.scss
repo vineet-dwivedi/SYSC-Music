@@ -1,0 +1,38 @@
+﻿:root[data-theme='ultra'] {
+  --ultra-bg-0: #fcfdff;
+  --ultra-bg-1: #f8faff;
+  --ultra-bg-2: #fffaf4;
+
+  --ultra-glass: rgba(255, 255, 255, 0.58);
+  --ultra-glass-strong: rgba(255, 255, 255, 0.74);
+  --ultra-stroke: rgba(255, 255, 255, 0.84);
+
+  --ultra-text: #111827;
+  --ultra-muted: #38445b;
+  --button-text: #111827;
+  --artist-name: #111827;
+
+  --ultra-aqua: #4ee3ff;
+  --ultra-violet: #a98bff;
+  --ultra-rose: #ff9ec9;
+  --ultra-mango: #ffc975;
+  --ultra-mint: #97f0bc;
+  --ultra-ink: #0c0f12;
+
+  // Override base theme variables for light theme
+  --bg: #fcfdff;
+  --bg-soft: #f8faff;
+  --text: #222225;
+  --text-muted: #38445b;
+  --accent: #4ee3ff;
+  --accent-strong: #3ec7ff;
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-strong: rgba(255, 255, 255, 0.74);
+  --border-soft: rgba(255, 255, 255, 0.84);
+}
+
+@keyframes ultraGradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+

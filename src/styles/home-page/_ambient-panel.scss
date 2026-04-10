@@ -1,0 +1,228 @@
+﻿.ambient-wave-panel {
+position: relative;
+isolation: isolate;
+overflow: hidden;
+min-height: clamp(116px, 15vw, 214px);
+padding: 0;
+background: linear-gradient(138deg, rgba(255,255,255,.56), rgba(255,255,255,.22));
+}
+
+.ambient-wave-panel__gradient {
+position: absolute;
+inset: -35% -10%;
+background:
+conic-gradient(
+from 100deg at 50% 50%,
+rgba(78, 227, 255, .26),
+rgba(169, 139, 255, .22),
+rgba(255, 158, 201, .24),
+rgba(255, 201, 117, .2),
+rgba(151, 240, 188, .2),
+rgba(78, 227, 255, .26)
+);
+filter: blur(34px) saturate(115%);
+z-index: 0;
+opacity: .9;
+animation: ambientSpin 28s linear infinite;
+pointer-events: none;
+}
+
+.ambient-wave-panel__orb {
+position: absolute;
+border-radius: 50%;
+filter: blur(24px);
+opacity: .5;
+pointer-events: none;
+z-index: 1;
+}
+
+.ambient-wave-panel__orb--one {
+width: clamp(150px, 24vw, 340px);
+aspect-ratio: 1 / 1;
+left: -8%;
+top: -20%;
+background: radial-gradient(circle, rgba(78, 227, 255, .5) 0%, transparent 72%);
+animation: ambientDriftOne 18s ease-in-out infinite;
+}
+
+.ambient-wave-panel__orb--two {
+width: clamp(180px, 30vw, 430px);
+aspect-ratio: 1 / 1;
+right: -10%;
+top: -16%;
+background: radial-gradient(circle, rgba(169, 139, 255, .46) 0%, transparent 74%);
+animation: ambientDriftTwo 21s ease-in-out infinite;
+}
+
+.ambient-wave-panel__orb--three {
+width: clamp(170px, 28vw, 410px);
+aspect-ratio: 1 / 1;
+left: 30%;
+bottom: -46%;
+background: radial-gradient(circle, rgba(255, 158, 201, .38) 0%, transparent 74%);
+animation: ambientDriftThree 24s ease-in-out infinite;
+}
+
+.ambient-wave-panel__sheen {
+position: absolute;
+inset: 0;
+z-index: 2;
+background: linear-gradient(
+104deg,
+transparent 0%,
+transparent 35%,
+rgba(255,255,255,.34) 49%,
+transparent 62%,
+transparent 100%
+);
+transform: translateX(-140%);
+animation: ambientSheen 11s cubic-bezier(.25,.46,.45,.94) infinite;
+pointer-events: none;
+}
+
+.ambient-wave-panel__veil {
+position: absolute;
+inset: 0;
+background:
+linear-gradient(115deg, rgba(14,18,31,.16), rgba(14,18,31,.04) 42%, rgba(22,28,46,.12)),
+radial-gradient(70% 100% at 10% 50%, rgba(207,233,255,.12), transparent 68%),
+radial-gradient(70% 100% at 90% 50%, rgba(255,214,231,.14), transparent 68%);
+z-index: 3;
+pointer-events: none;
+}
+
+.ambient-wave-panel__glow {
+position: absolute;
+inset: 0;
+background:
+radial-gradient(46% 84% at 16% 50%, rgba(207,233,255,.22) 0%, transparent 72%),
+radial-gradient(46% 84% at 84% 50%, rgba(255,214,231,.22) 0%, transparent 72%);
+pointer-events: none;
+z-index: 4;
+}
+
+.ambient-wave-panel__title {
+position: absolute;
+left: clamp(16px, 3.4vw, 44px);
+top: 50%;
+transform: translateY(-50%);
+z-index: 5;
+pointer-events: none;
+user-select: none;
+font-size: clamp(.74rem, 1.15vw, 1.06rem);
+font-weight: 300;
+letter-spacing: .24em;
+text-transform: uppercase;
+color: rgba(8, 12, 22, .78);
+text-shadow: 0 1px 2px rgba(255,255,255,.4);
+}
+
+.ambient-wave-panel__greeting {
+position: absolute;
+right: clamp(16px, 3.6vw, 44px);
+top: 50%;
+transform: translateY(-50%);
+z-index: 5;
+display: flex;
+flex-direction: column;
+align-items: flex-end;
+gap: 2px;
+max-width: min(56vw, 360px);
+pointer-events: none;
+}
+
+.ambient-wave-panel__welcome {
+font-size: clamp(.68rem, 1vw, .9rem);
+font-weight: 500;
+letter-spacing: .12em;
+text-transform: uppercase;
+color: rgba(8, 12, 22, .72);
+text-shadow: 0 1px 2px rgba(255,255,255,.38);
+animation: ambientWelcomePulse 2.8s ease-in-out infinite;
+}
+
+.ambient-wave-panel__name {
+font-size: clamp(1rem, 2vw, 1.6rem);
+font-weight: 700;
+line-height: 1.1;
+color: rgba(5, 10, 20, .86);
+text-shadow: 0 1px 2px rgba(255,255,255,.35);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+max-width: 100%;
+position: relative;
+display: inline-block;
+background: linear-gradient(
+  120deg,
+  rgba(6, 12, 24, .88) 0%,
+  rgba(20, 31, 52, .95) 42%,
+  rgba(255, 255, 255, .92) 50%,
+  rgba(21, 33, 54, .95) 58%,
+  rgba(6, 12, 24, .88) 100%
+);
+background-size: 240% 100%;
+-webkit-background-clip: text;
+background-clip: text;
+-webkit-text-fill-color: transparent;
+animation:
+  ambientNameSweep 3.8s ease-in-out infinite,
+  ambientNameFloat 5.2s ease-in-out infinite;
+}
+
+@keyframes ambientWelcomePulse {
+0%, 100% {
+  opacity: .76;
+  transform: translate3d(0, 0, 0);
+}
+50% {
+  opacity: 1;
+  transform: translate3d(0, -1px, 0);
+}
+}
+
+@keyframes ambientNameSweep {
+0% {
+  background-position: 140% 50%;
+  filter: drop-shadow(0 0 0 rgba(255,255,255,0));
+}
+50% {
+  background-position: 36% 50%;
+  filter: drop-shadow(0 2px 7px rgba(255,255,255,.18));
+}
+100% {
+  background-position: -120% 50%;
+  filter: drop-shadow(0 0 0 rgba(255,255,255,0));
+}
+}
+
+@keyframes ambientNameFloat {
+0%, 100% { transform: translate3d(0, 0, 0); }
+50% { transform: translate3d(0, -2px, 0); }
+}
+
+@keyframes ambientSpin {
+0% { transform: rotate(0deg) scale(1); }
+100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes ambientDriftOne {
+0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+50% { transform: translate3d(8%, 9%, 0) scale(1.07); }
+}
+
+@keyframes ambientDriftTwo {
+0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+50% { transform: translate3d(-8%, 7%, 0) scale(1.09); }
+}
+
+@keyframes ambientDriftThree {
+0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+50% { transform: translate3d(3%, -10%, 0) scale(1.08); }
+}
+
+@keyframes ambientSheen {
+0%, 60% { transform: translateX(-140%); }
+100% { transform: translateX(160%); }
+}
+

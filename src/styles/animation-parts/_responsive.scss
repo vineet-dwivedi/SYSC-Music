@@ -1,0 +1,26 @@
+﻿@media (prefers-reduced-motion: reduce) {
+  .animate-fade-slide,
+  .animate-card,
+  .page-credit__text,
+  .theme-bloom {
+    animation: none;
+  }
+
+  .lens-wipe,
+  .theme-bloom__veil {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (max-width: 740px) {
+  .page-credit {
+    padding-bottom: calc(220px + env(safe-area-inset-bottom));
+  }
+
+  .page-credit__text {
+    font-size: .66rem;
+    letter-spacing: .09em;
+    padding: 6px 10px;
+  }
+}
