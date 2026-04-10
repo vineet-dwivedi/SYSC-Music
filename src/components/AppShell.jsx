@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { gsap } from 'gsap'
 import AppBackground from './AppBackground.jsx'
 import Topbar from './Topbar.jsx'
@@ -25,8 +25,10 @@ import { usePageLenis } from '../hooks/usePageLenis.js'
 function AppShell({ c }) {
   const appShellRef = useRef(null)
   const pageStackRef = useRef(null)
+  const themeBloomRef = useRef(null)
+  const prefersReducedMotion = useReducedMotion()
 
-  usePageLenis({
+  const lenisRef = usePageLenis({
     containerRef: pageStackRef,
     activePage: c.activePage,
     enabled: c.introComplete,
@@ -35,6 +37,8 @@ function AppShell({ c }) {
   useEffect(() => {
     if (!c.themeTransition || typeof window === 'undefined') return undefined
 
+    const transitionTheme = c.themeTransition.toTheme ?? c.theme
+
     const ctx = gsap.context(() => {
       gsap.timeline()
         .fromTo(
@@ -42,7 +46,10 @@ function AppShell({ c }) {
           { scale: 0.985, filter: 'saturate(1) brightness(1)' },
           {
             scale: 1.018,
-            filter: c.theme === 'midnight' ? 'saturate(1.2) brightness(0.92)' : 'saturate(1.08) brightness(1.05)',
+            filter:
+              transitionTheme === 'midnight'
+                ? 'saturate(1.2) brightness(0.92)'
+                : 'saturate(1.08) brightness(1.05)',
             duration: 0.34,
             ease: 'power2.out',
           },
@@ -57,6 +64,163 @@ function AppShell({ c }) {
 
     return () => ctx.revert()
   }, [c.theme, c.themeTransition])
+
+  useEffect(() => {
+    if (!c.themeTransition || typeof window === 'undefined') return undefined
+
+    const bloom = themeBloomRef.current
+    if (!(bloom instanceof HTMLElement)) return undefined
+
+    const lenis = lenisRef.current
+    const veil = bloom.querySelector('.theme-bloom__veil')
+    const halo = bloom.querySelector('.theme-bloom__halo')
+    const sheen = bloom.querySelector('.theme-bloom__sheen')
+    const commitAt = prefersReducedMotion ? 0.16 : 0.42
+    const duration = prefersReducedMotion ? 0.24 : 1.12
+    let hasCommitted = false
+
+    lenis?.stop?.()
+
+    gsap.set(bloom, {
+      '--theme-progress': 0,
+      '--theme-blur': prefersReducedMotion ? '0px' : '18px',
+      '--theme-opacity': 0.98,
+    })
+
+    if (veil instanceof HTMLElement) {
+      gsap.set(veil, {
+        opacity: prefersReducedMotion ? 0.42 : 0.24,
+      })
+    }
+
+    if (halo instanceof HTMLElement) {
+      gsap.set(halo, {
+        opacity: prefersReducedMotion ? 0.26 : 0.18,
+        scale: 0.78,
+      })
+    }
+
+    if (sheen instanceof HTMLElement) {
+      gsap.set(sheen, {
+        opacity: 0,
+        xPercent: -30,
+      })
+    }
+
+    const commitTheme = () => {
+      if (hasCommitted) return
+      hasCommitted = true
+      c.handleThemeTransitionCommit?.({
+        id: c.themeTransition.id,
+        theme: c.themeTransition.toTheme,
+      })
+    }
+
+    const timeline = gsap.timeline({
+      defaults: {
+        ease: prefersReducedMotion ? 'power1.out' : 'expo.inOut',
+      },
+      onComplete: () => {
+        commitTheme()
+        lenis?.start?.()
+        c.handleThemeTransitionComplete?.(c.themeTransition.id)
+      },
+    })
+
+    timeline.to(
+      bloom,
+      {
+        '--theme-progress': 1,
+        '--theme-blur': prefersReducedMotion ? '0px' : '2px',
+        '--theme-opacity': 1,
+        duration,
+        onUpdate: () => {
+          if (timeline.progress() >= commitAt) {
+            commitTheme()
+          }
+        },
+      },
+      0,
+    )
+
+    if (veil instanceof HTMLElement) {
+      timeline.to(
+        veil,
+        {
+          opacity: prefersReducedMotion ? 0.56 : 0.94,
+          duration: duration * 0.44,
+          ease: 'sine.out',
+        },
+        0,
+      )
+      timeline.to(
+        veil,
+        {
+          opacity: prefersReducedMotion ? 0.2 : 0.34,
+          duration: duration * 0.56,
+          ease: 'power2.inOut',
+        },
+        duration * 0.34,
+      )
+    }
+
+    if (halo instanceof HTMLElement) {
+      timeline.to(
+        halo,
+        {
+          opacity: prefersReducedMotion ? 0.34 : 0.72,
+          scale: 1.18,
+          duration: duration * 0.62,
+          ease: 'power2.out',
+        },
+        0,
+      )
+      timeline.to(
+        halo,
+        {
+          opacity: 0,
+          scale: 1.34,
+          duration: duration * 0.38,
+          ease: 'power3.out',
+        },
+        duration * 0.54,
+      )
+    }
+
+    if (sheen instanceof HTMLElement) {
+      timeline.to(
+        sheen,
+        {
+          opacity: prefersReducedMotion ? 0 : 0.68,
+          xPercent: 16,
+          duration: duration * 0.5,
+          ease: 'power2.out',
+        },
+        duration * 0.12,
+      )
+      timeline.to(
+        sheen,
+        {
+          opacity: 0,
+          xPercent: 54,
+          duration: duration * 0.34,
+          ease: 'power2.in',
+        },
+        duration * 0.56,
+      )
+    }
+
+    return () => {
+      timeline.kill()
+      lenis?.start?.()
+    }
+  }, [
+    c.handleThemeTransitionCommit,
+    c.handleThemeTransitionComplete,
+    c.themeTransition,
+    lenisRef,
+    prefersReducedMotion,
+  ])
 
   const pageFooter = (
     <footer className="page-credit" aria-label="Copyright">
@@ -294,23 +458,21 @@ function AppShell({ c }) {
             {c.themeTransition ? (
               <motion.div
                 key={`theme-${c.themeTransition.id}`}
-                className={`theme-bloom theme-bloom--${c.themeTransition.theme}`}
+                ref={themeBloomRef}
+                className={`theme-bloom theme-bloom--${c.themeTransition.toTheme}`}
                 style={{
                   '--theme-origin-x': `${c.themeTransition.x}px`,
                   '--theme-origin-y': `${c.themeTransition.y}px`,
+                  '--theme-max-radius': `${c.themeTransition.radius}px`,
                 }}
-                initial={{
-                  opacity: 0.92,
-                  clipPath: `circle(0px at ${c.themeTransition.x}px ${c.themeTransition.y}px)`,
-                }}
-                animate={{
-                  opacity: 1,
-                  clipPath: `circle(160vmax at ${c.themeTransition.x}px ${c.themeTransition.y}px)`,
-                }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.9, ease: [0.22, 0.61, 0.36, 1] }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: prefersReducedMotion ? 0.12 : 0.3 } }}
+                transition={{ duration: prefersReducedMotion ? 0.12 : 0.22, ease: [0.22, 0.61, 0.36, 1] }}
               >
+                <div className="theme-bloom__halo" />
                 <div className="theme-bloom__veil" />
+                <div className="theme-bloom__sheen" />
               </motion.div>
             ) : null}
           </AnimatePresence>

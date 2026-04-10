@@ -135,7 +135,8 @@
 
 .album-card__meta p {
   font-size: .82rem;
-  color: rgba(12, 12, 12, 0.6);
+  color: var(--artist-name);
+  opacity: .75;
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;

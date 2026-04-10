@@ -55,6 +55,14 @@ const applyThemeToDocument = (theme) => {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
 }
 
+const computeThemeTransitionRadius = (origin) => {
+  if (typeof window === 'undefined') return 0
+
+  const maxX = Math.max(origin.x, window.innerWidth - origin.x)
+  const maxY = Math.max(origin.y, window.innerHeight - origin.y)
+  return Math.hypot(maxX, maxY) + 140
+}
+
 const persistSession = (session) => {
   if (typeof window === 'undefined') return
   if (session) {
@@ -67,7 +75,15 @@ const persistSession = (session) => {
 const initialTheme = readStoredTheme()
 applyThemeToDocument(initialTheme)
 
-function AppContent({ authSession, onLogout, theme, themeTransition, onThemeToggle }) {
+function AppContent({
+  authSession,
+  onLogout,
+  theme,
+  themeTransition,
+  onThemeToggle,
+  onThemeTransitionCommit,
+  onThemeTransitionComplete,
+}) {
   const controller = useAppController()
 
   return (
@@ -79,6 +95,8 @@ function AppContent({ authSession, onLogout, theme, themeTransition, onThemeTogg
         theme,
         themeTransition,
         handleThemeToggle: onThemeToggle,
+        handleThemeTransitionCommit: onThemeTransitionCommit,
+        handleThemeTransitionComplete: onThemeTransitionComplete,
       }}
     />
   )
@@ -107,16 +125,6 @@ function App() {
       // Ignore storage failures and keep the in-memory theme.
     }
   }, [theme])
-
-  useEffect(() => {
-    if (!themeTransition || typeof window === 'undefined') return undefined
-
-    const timer = window.setTimeout(() => {
-      setThemeTransition(null)
-    }, 980)
-
-    return () => window.clearTimeout(timer)
-  }, [themeTransition])
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
@@ -166,6 +174,8 @@ function App() {
   }, [])
 
   const handleThemeToggle = useCallback((origin) => {
+    if (themeTransition) return
+
     const nextTheme = theme === 'midnight' ? DEFAULT_THEME : 'midnight'
     const fallbackOrigin = typeof window === 'undefined'
       ? { x: 0, y: 0 }
@@ -176,13 +186,33 @@ function App() {
         ? { x: origin.x, y: origin.y }
         : fallbackOrigin
 
-    setTheme(nextTheme)
     setThemeTransition({
       id: Date.now(),
-      theme: nextTheme,
+      fromTheme: theme,
+      toTheme: nextTheme,
+      committed: false,
+      radius: computeThemeTransitionRadius(safeOrigin),
       ...safeOrigin,
     })
-  }, [theme])
+  }, [theme, themeTransition])
+
+  const handleThemeTransitionCommit = useCallback(({ id, theme: nextTheme }) => {
+    setTheme(resolveTheme(nextTheme))
+    setThemeTransition((current) => {
+      if (!current || current.id !== id || current.committed) return current
+      return {
+        ...current,
+        committed: true,
+      }
+    })
+  }, [])
+
+  const handleThemeTransitionComplete = useCallback((id) => {
+    setThemeTransition((current) => {
+      if (!current || current.id !== id) return current
+      return null
+    })
+  }, [])
 
   if (!session) {
     return (
@@ -201,6 +231,8 @@ function App() {
       theme={theme}
       themeTransition={themeTransition}
       onThemeToggle={handleThemeToggle}
+      onThemeTransitionCommit={handleThemeTransitionCommit}
+      onThemeTransitionComplete={handleThemeTransitionComplete}
     />
   )
 }

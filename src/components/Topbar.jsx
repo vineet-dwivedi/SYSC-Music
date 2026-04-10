@@ -29,25 +29,40 @@ function Topbar({ onSearchOpen, onNavigate, onLogout, theme = 'ultra', onThemeTo
           Playlist
         </button>
         <motion.button
-          className="ghost-button topbar__theme-button"
+          className="topbar__theme-button"
           type="button"
           onClick={handleThemeToggle}
           aria-label={`Switch to ${isUltraTheme ? 'midnight' : 'ultra'} theme`}
-          whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.01 }}
-          whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
+          title={`Switch to ${isUltraTheme ? 'midnight' : 'ultra'} theme`}
+          whileHover={prefersReducedMotion ? undefined : { y: -1.5, scale: 1.03 }}
+          whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
+          transition={prefersReducedMotion ? undefined : { type: 'spring', stiffness: 380, damping: 24 }}
         >
-          <span className="topbar__theme-visual" aria-hidden="true">
+          <motion.span
+            className="topbar__theme-visual"
+            aria-hidden="true"
+            animate={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    rotate: isUltraTheme ? 0 : 180,
+                    scale: isUltraTheme ? 1 : 0.96,
+                  }
+            }
+            transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+          >
             <motion.span
               className="topbar__theme-lenis"
               animate={
                 prefersReducedMotion
                   ? undefined
                   : {
-                      rotate: isUltraTheme ? 0 : 180,
-                      scale: isUltraTheme ? 1 : 1.06,
+                      rotate: isUltraTheme ? 0 : -180,
+                      scale: isUltraTheme ? 1 : 1.08,
+                      opacity: isUltraTheme ? 0.9 : 0.58,
                     }
               }
-              transition={{ duration: 0.65, ease: [0.22, 0.61, 0.36, 1] }}
+              transition={{ duration: 0.85, ease: [0.22, 0.61, 0.36, 1] }}
             >
               <span className="icon icon--lenis" />
             </motion.span>
@@ -59,11 +74,12 @@ function Topbar({ onSearchOpen, onNavigate, onLogout, theme = 'ultra', onThemeTo
                     ? undefined
                     : {
                         opacity: isUltraTheme ? 1 : 0,
-                        rotate: isUltraTheme ? 0 : -80,
-                        scale: isUltraTheme ? 1 : 0.5,
+                        rotate: isUltraTheme ? 0 : -88,
+                        scale: isUltraTheme ? 1 : 0.42,
+                        y: isUltraTheme ? 0 : -3,
                       }
                 }
-                transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
+                transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
               />
               <motion.span
                 className="icon icon--moon"
@@ -72,18 +88,16 @@ function Topbar({ onSearchOpen, onNavigate, onLogout, theme = 'ultra', onThemeTo
                     ? undefined
                     : {
                         opacity: isUltraTheme ? 0 : 1,
-                        rotate: isUltraTheme ? 80 : 0,
-                        scale: isUltraTheme ? 0.45 : 1,
+                        rotate: isUltraTheme ? 88 : 0,
+                        scale: isUltraTheme ? 0.42 : 1,
+                        y: isUltraTheme ? 3 : 0,
                       }
                 }
-                transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
+                transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
               />
             </span>
-          </span>
-          <span className="topbar__theme-copy">
-            <span className="topbar__theme-label">Theme</span>
-            <span className="topbar__theme-value">{isUltraTheme ? 'Ultra' : 'Midnight'}</span>
-          </span>
+          </motion.span>
+          <span className="topbar__theme-sr">{isUltraTheme ? 'Ultra theme active' : 'Midnight theme active'}</span>
         </motion.button>
         {typeof onLogout === 'function' ? (
           <button className="ghost-button topbar__nav-button topbar__logout-button" type="button" onClick={onLogout}>
