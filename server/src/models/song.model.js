@@ -52,4 +52,7 @@ const songSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+songSchema.index({ createdAt: -1 });
+songSchema.index({ playlistId: 1, title: 1 });
+
 export default mongoose.model("Song", songSchema);

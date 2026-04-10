@@ -62,31 +62,48 @@ function usePlaybackController({ addToast }) {
   useEffect(() => {
     if (didFetchRef.current) return
     didFetchRef.current = true
+    let isCancelled = false
 
     const fetchTracks = async () => {
       try {
         setIsLoading(true)
         const res = await getWithFallback('/tracks')
         const normalized = normalizeTracks(res.data)
+        if (isCancelled) return
+
         setTracks(normalized)
         setQueue(normalized)
+        setIsLoading(false)
 
-        const enriched = await hydrateTrackDurations(normalized)
-        const durationMap = new Map(
-          enriched.map((track) => [trackIdentity(track), track.duration]),
-        )
-        setTracks((prev) => mergeDurationMap(prev, durationMap))
-        setQueue((prev) => mergeDurationMap(prev, durationMap))
+        hydrateTrackDurations(normalized)
+          .then((enriched) => {
+            if (isCancelled) return
+            const durationMap = new Map(
+              enriched.map((track) => [trackIdentity(track), track.duration]),
+            )
+            setTracks((prev) => mergeDurationMap(prev, durationMap))
+            setQueue((prev) => mergeDurationMap(prev, durationMap))
+          })
+          .catch((err) => {
+            console.warn('Duration hydration skipped:', err)
+          })
       } catch (err) {
+        if (isCancelled) return
         const activeBase = api.defaults.baseURL ?? 'unknown'
         console.error(`API failed (base: ${activeBase})`, err)
         setTracks([])
         setQueue([])
       } finally {
-        setIsLoading(false)
+        if (!isCancelled) {
+          setIsLoading(false)
+        }
       }
     }
     fetchTracks()
+
+    return () => {
+      isCancelled = true
+    }
   }, [])
 
   useEffect(() => {
