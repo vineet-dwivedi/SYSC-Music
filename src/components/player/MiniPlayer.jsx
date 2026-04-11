@@ -4,15 +4,24 @@ function MiniPlayer({
   track,
   trackImage,
   isPlaying,
+  isShuffleEnabled,
+  loopMode,
   onPlayToggle,
   onNext,
   onPrev,
+  onToggleShuffle,
+  onCycleLoopMode,
   progress,
   onSeek,
   volumePercent,
   onVolumeChange,
 }) {
   const artStyle = trackImage ? { backgroundImage: `url(${trackImage})` } : undefined
+  let loopLabel = 'Repeat off'
+  if (loopMode === 'all') loopLabel = 'Repeat queue'
+  else if (loopMode === 'one') loopLabel = 'Repeat current track'
+
+  const loopIconClass = loopMode === 'one' ? 'icon--repeat-one' : 'icon--repeat'
 
   return (
     <div className={`mini-player ${isHidden ? 'is-hidden' : ''}`}>
@@ -39,6 +48,15 @@ function MiniPlayer({
       </div>
       <div className="mini-player__controls">
         <button
+          className={`icon-button mini-player__control mini-player__control--shuffle ${isShuffleEnabled ? 'is-active-mode' : ''}`}
+          type="button"
+          aria-label={isShuffleEnabled ? 'Disable shuffle' : 'Enable shuffle'}
+          aria-pressed={isShuffleEnabled}
+          onClick={onToggleShuffle}
+        >
+          <span className="icon icon--shuffle" />
+        </button>
+        <button
           className="icon-button mini-player__control mini-player__control--prev"
           type="button"
           aria-label="Previous track"
@@ -61,6 +79,15 @@ function MiniPlayer({
           onClick={onNext}
         >
           <span className="icon icon--next" />
+        </button>
+        <button
+          className={`icon-button mini-player__control mini-player__control--loop ${loopMode !== 'off' ? 'is-active-mode' : ''}`}
+          type="button"
+          aria-label={loopLabel}
+          aria-pressed={loopMode !== 'off'}
+          onClick={onCycleLoopMode}
+        >
+          <span className={`icon ${loopIconClass}`} />
         </button>
       </div>
       <div className="mini-player__volume">

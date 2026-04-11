@@ -118,7 +118,7 @@
 .mini-player__controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .mini-player__volume {
@@ -180,6 +180,13 @@
   color: #0b0c10;
   border: none;
   box-shadow: 0 10px 26px rgba(0,0,0,.45);
+}
+
+.mini-player .icon-button.is-active-mode {
+  background: linear-gradient(120deg, rgba(207,233,255,.92), rgba(255,214,231,.92));
+  color: #0b0c10;
+  border-color: transparent;
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
 }
 
 .mini-player__expand {
@@ -265,8 +272,10 @@
     gap: 0;
   }
 
+  .mini-player__control--shuffle,
   .mini-player__control--prev,
-  .mini-player__control--next {
+  .mini-player__control--next,
+  .mini-player__control--loop {
     display: none;
   }
 

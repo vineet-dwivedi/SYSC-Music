@@ -4,9 +4,13 @@ function PlayerOverlay({
   track,
   trackImage,
   isPlaying,
+  isShuffleEnabled,
+  loopMode,
   onPlayToggle,
   onNext,
   onPrev,
+  onToggleShuffle,
+  onCycleLoopMode,
   onAddToQueue,
   onShare,
   progress,
@@ -18,6 +22,11 @@ function PlayerOverlay({
 }) {
   const hasTrackImage = Boolean(trackImage)
   const artStyle = hasTrackImage ? { backgroundImage: `url(${trackImage})` } : undefined
+  let loopLabel = 'Repeat off'
+  if (loopMode === 'all') loopLabel = 'Repeat queue'
+  else if (loopMode === 'one') loopLabel = 'Repeat current track'
+
+  const loopIconClass = loopMode === 'one' ? 'icon--repeat-one' : 'icon--repeat'
 
   return (
     <div
@@ -39,6 +48,15 @@ function PlayerOverlay({
           <p className="page__subtitle">{track ? `${track.artist} - Focus Sessions` : '-'}</p>
         </div>
         <div className="full-player__controls">
+          <button
+            className={`icon-button ${isShuffleEnabled ? 'is-active-mode' : ''}`}
+            type="button"
+            aria-label={isShuffleEnabled ? 'Disable shuffle' : 'Enable shuffle'}
+            aria-pressed={isShuffleEnabled}
+            onClick={onToggleShuffle}
+          >
+            <span className="icon icon--shuffle" />
+          </button>
           <button className="icon-button" type="button" aria-label="Previous track" onClick={onPrev}>
             <span className="icon icon--prev" />
           </button>
@@ -52,6 +70,15 @@ function PlayerOverlay({
           </button>
           <button className="icon-button" type="button" aria-label="Next track" onClick={onNext}>
             <span className="icon icon--next" />
+          </button>
+          <button
+            className={`icon-button ${loopMode !== 'off' ? 'is-active-mode' : ''}`}
+            type="button"
+            aria-label={loopLabel}
+            aria-pressed={loopMode !== 'off'}
+            onClick={onCycleLoopMode}
+          >
+            <span className={`icon ${loopIconClass}`} />
           </button>
         </div>
         <div className="full-player__progress">

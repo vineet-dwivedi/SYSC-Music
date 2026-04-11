@@ -391,16 +391,25 @@ function AppShell({ c }) {
               track={c.currentTrack}
               trackImage={c.currentTrackImage}
               isPlaying={c.isPlaying}
+              isShuffleEnabled={c.isShuffleEnabled}
+              loopMode={c.loopMode}
               onPlayToggle={c.handleTogglePlay}
               onNext={c.handleNext}
               onPrev={c.handlePrev}
+              onToggleShuffle={c.handleToggleShuffle}
+              onCycleLoopMode={c.handleCycleLoopMode}
               progress={c.progressPercent}
               onSeek={c.handleSeek}
               volumePercent={c.volumePercent}
               onVolumeChange={c.handleVolumeChange}
             />
             {c.currentTrack?.audioUrl ? (
-              <audio ref={c.audioRef} src={c.currentTrack.audioUrl} preload="metadata" onEnded={c.handleNext} />
+              <audio
+                ref={c.audioRef}
+                src={c.currentTrack.audioUrl}
+                preload="metadata"
+                onEnded={c.handleTrackEnd}
+              />
             ) : null}
 
             <PlayerOverlay
@@ -409,9 +418,13 @@ function AppShell({ c }) {
               track={c.currentTrack}
               trackImage={c.currentTrackImage}
               isPlaying={c.isPlaying}
+              isShuffleEnabled={c.isShuffleEnabled}
+              loopMode={c.loopMode}
               onPlayToggle={c.handleTogglePlay}
               onNext={c.handleNext}
               onPrev={c.handlePrev}
+              onToggleShuffle={c.handleToggleShuffle}
+              onCycleLoopMode={c.handleCycleLoopMode}
               onAddToQueue={c.handleAddToQueue}
               onShare={c.handleShare}
               progress={c.progressPercent}

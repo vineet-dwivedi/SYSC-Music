@@ -11,11 +11,28 @@ import {
   trackIdentity,
 } from './utils.js'
 
+const LOOP_MODE_OFF = 'off'
+const LOOP_MODE_ALL = 'all'
+const LOOP_MODE_ONE = 'one'
+
+const getRandomQueueIndex = (length, currentIndex) => {
+  if (length <= 1) return currentIndex ?? 0
+
+  let nextIndex = currentIndex ?? Math.floor(Math.random() * length)
+  while (nextIndex === currentIndex) {
+    nextIndex = Math.floor(Math.random() * length)
+  }
+
+  return nextIndex
+}
+
 function usePlaybackController({ addToast }) {
   const [queue, setQueue] = useState([])
   const [tracks, setTracks] = useState([])
   const [currentTrackIndex, setCurrentTrackIndex] = useState(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isShuffleEnabled, setIsShuffleEnabled] = useState(false)
+  const [loopMode, setLoopMode] = useState(LOOP_MODE_ALL)
   const [activeAlbum, setActiveAlbum] = useState(null)
   const [playbackPosition, setPlaybackPosition] = useState(0)
   const [trackDuration, setTrackDuration] = useState(parseDuration(tracks[0]?.duration))
@@ -215,6 +232,33 @@ function usePlaybackController({ addToast }) {
     return () => window.removeEventListener('keydown', handleKey)
   }, [showVolumeHud])
 
+  const resolveNextIndex = useCallback(
+    (reason = 'manual') => {
+      if (!queue.length) return null
+
+      const activeIndex = currentTrackIndex ?? 0
+
+      if (reason === 'ended' && loopMode === LOOP_MODE_ONE) {
+        return activeIndex
+      }
+
+      if (isShuffleEnabled) {
+        if (queue.length === 1) {
+          return loopMode === LOOP_MODE_OFF ? null : 0
+        }
+
+        return getRandomQueueIndex(queue.length, currentTrackIndex)
+      }
+
+      if (currentTrackIndex === null) return 0
+      if (currentTrackIndex < queue.length - 1) return currentTrackIndex + 1
+      if (loopMode === LOOP_MODE_ALL) return 0
+
+      return null
+    },
+    [queue.length, currentTrackIndex, isShuffleEnabled, loopMode],
+  )
+
   const handlePlayQueue = useCallback(
     (nextQueue, startIndex = 0, label) => {
       const queueToPlay = nextQueue?.length ? nextQueue : tracks
@@ -255,10 +299,11 @@ function usePlaybackController({ addToast }) {
   const handleTogglePlay = useCallback(() => {
     if (!queue.length) return
     if (currentTrackIndex === null) {
-      setCurrentTrackIndex(0)
+      const startIndex = isShuffleEnabled ? getRandomQueueIndex(queue.length, null) : 0
+      setCurrentTrackIndex(startIndex)
       setPlaybackPosition(0)
       setIsPlaying(true)
-      addToast(`Now playing "${queue[0].title}"`, 'success')
+      addToast(`Now playing "${queue[startIndex].title}"`, 'success')
       return
     }
     setIsPlaying((prev) => {
@@ -270,26 +315,111 @@ function usePlaybackController({ addToast }) {
       addToast(next ? 'Playback resumed' : 'Playback paused', next ? 'success' : 'info')
       return next
     })
-  }, [queue, currentTrackIndex, addToast, playbackPosition, trackDuration])
+  }, [queue, currentTrackIndex, addToast, isShuffleEnabled, playbackPosition, trackDuration])
 
   const handleNext = useCallback(() => {
     if (!queue.length) return
-    const nextIndex = currentTrackIndex === null ? 0 : (currentTrackIndex + 1) % queue.length
+    const nextIndex = resolveNextIndex('manual')
+    if (nextIndex === null) {
+      addToast('Reached end of queue', 'info')
+      return
+    }
+
+    if (nextIndex === currentTrackIndex) {
+      const audio = audioRef.current
+      if (audio) {
+        audio.currentTime = 0
+        audio.play().catch(() => {})
+      }
+    }
+
     setCurrentTrackIndex(nextIndex)
+    setPlaybackPosition(0)
     setIsPlaying(true)
     const nextTrack = queue[nextIndex]
     if (nextTrack) addToast(`Up next: "${nextTrack.title}"`, 'info')
-  }, [queue, currentTrackIndex, addToast])
+  }, [queue, currentTrackIndex, addToast, resolveNextIndex])
 
   const handlePrev = useCallback(() => {
     if (!queue.length) return
-    const prevIndex =
-      currentTrackIndex === null ? 0 : (currentTrackIndex - 1 + queue.length) % queue.length
+
+    const audio = audioRef.current
+    if (audio && audio.currentTime > 3) {
+      audio.currentTime = 0
+      setPlaybackPosition(0)
+      return
+    }
+
+    let prevIndex = 0
+    if (currentTrackIndex === null) {
+      prevIndex = 0
+    } else if (currentTrackIndex > 0) {
+      prevIndex = currentTrackIndex - 1
+    } else if (loopMode === LOOP_MODE_ALL) {
+      prevIndex = queue.length - 1
+    } else {
+      setPlaybackPosition(0)
+      if (audio) audio.currentTime = 0
+      addToast('At the start of queue', 'info')
+      return
+    }
+
     setCurrentTrackIndex(prevIndex)
+    setPlaybackPosition(0)
     setIsPlaying(true)
     const prevTrack = queue[prevIndex]
     if (prevTrack) addToast(`Now playing "${prevTrack.title}"`, 'info')
-  }, [queue, currentTrackIndex, addToast])
+  }, [queue, currentTrackIndex, loopMode, addToast])
+
+  const handleToggleShuffle = useCallback(() => {
+    setIsShuffleEnabled((prev) => {
+      const next = !prev
+      addToast(`Shuffle ${next ? 'enabled' : 'disabled'}`, 'info')
+      return next
+    })
+  }, [addToast])
+
+  const handleCycleLoopMode = useCallback(() => {
+    setLoopMode((prev) => {
+      let next = LOOP_MODE_OFF
+      if (prev === LOOP_MODE_OFF) next = LOOP_MODE_ALL
+      else if (prev === LOOP_MODE_ALL) next = LOOP_MODE_ONE
+
+      let label = 'Loop disabled'
+      if (next === LOOP_MODE_ALL) label = 'Loop queue enabled'
+      else if (next === LOOP_MODE_ONE) label = 'Loop current track enabled'
+
+      addToast(label, 'info')
+      return next
+    })
+  }, [addToast])
+
+  const handleTrackEnd = useCallback(() => {
+    if (!queue.length) return
+
+    const nextIndex = resolveNextIndex('ended')
+    if (nextIndex === null) {
+      setIsPlaying(false)
+      setPlaybackPosition(trackDuration)
+      addToast('Reached end of queue', 'info')
+      return
+    }
+
+    if (nextIndex === currentTrackIndex) {
+      const audio = audioRef.current
+      if (audio) {
+        audio.currentTime = 0
+        audio.play().catch(() => {})
+      }
+      setPlaybackPosition(0)
+      setIsPlaying(true)
+      return
+    }
+
+    setCurrentTrackIndex(nextIndex)
+    setPlaybackPosition(0)
+    setIsPlaying(true)
+  }, [queue.length, currentTrackIndex, resolveNextIndex, trackDuration, addToast])
 
   const handleAddToQueue = useCallback(
     (trackToQueue) => {
@@ -381,6 +511,7 @@ function usePlaybackController({ addToast }) {
     audioRef,
     currentTrack,
     handleAddToQueue,
+    handleCycleLoopMode,
     handleNext,
     handlePlayAlbum,
     handlePlayQueue,
@@ -388,10 +519,14 @@ function usePlaybackController({ addToast }) {
     handlePrev,
     handleSeek,
     handleShare,
+    handleToggleShuffle,
     handleTogglePlay,
+    handleTrackEnd,
     handleVolumeChange,
     isLoading,
     isPlaying,
+    isShuffleEnabled,
+    loopMode,
     playbackDurationLabel,
     playbackTimeLabel,
     progressPercent,
