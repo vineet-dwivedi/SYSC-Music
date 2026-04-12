@@ -1,22 +1,17 @@
-# 🎵 SYSC Music
+# SYSC Music (Full Stack Music Platform)
+
+---
+
+<h3 align="center">Tech Stack</h3>
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=32&pause=1000&color=00F5D4&center=true&vCenter=true&width=800&lines=Animated+Full-Stack+Music+Streaming;Modern+Web+Architecture;React+%2B+Node.js+%2B+MongoDB" />
+  <img src="https://skillicons.dev/icons?i=react,vite,express,mongodb,sass,google" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-React%2019-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
-  <img src="https://img.shields.io/badge/Build-Vite%207-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/Backend-Express%205-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
-  <img src="https://img.shields.io/badge/Database-MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/Auth-Google%20OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google OAuth" />
-  <img src="https://img.shields.io/badge/Styling-SCSS-C69?style=for-the-badge&logo=sass&logoColor=white" alt="SCSS" />
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square" alt="Status" />
-  <img src="https://img.shields.io/badge/License-ISC-blue?style=flat-square" alt="License" />
-  <img src="https://img.shields.io/badge/Type-Full%20Stack-brightblue?style=flat-square" alt="Type" />
+  <sub>
+    React • Vite • Express • MongoDB • Google OAuth • SCSS
+  </sub>
 </p>
 
 ---
@@ -50,83 +45,87 @@
 
 ### Frontend Stack
 
-<table>
+<h3 align="center">Tech Stack</h3>
+
+<table align="center">
   <tr>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="50" height="50" alt="React" />
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="50" height="50" alt="React" />
       <br><b>React 19</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vitejs/vitejs-original.svg" width="50" height="50" alt="Vite" />
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="50" height="50" alt="Vite" />
       <br><b>Vite 7</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/sass/sass-original.svg" width="50" height="50" alt="SCSS" />
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sass/sass-original.svg" width="50" height="50" alt="SCSS" />
       <br><b>SCSS</b>
     </td>
     <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/23551445?s=200&v=4" width="50" height="50" alt="Framer Motion" />
+      <img src="https://cdn.simpleicons.org/framer" width="50" height="50" alt="Framer Motion" />
       <br><b>Framer Motion</b>
     </td>
   </tr>
+
   <tr>
     <td align="center">
-      <img src="https://greensock.com/gsap-social.png" width="50" height="50" alt="GSAP" />
+      <img src="https://cdn.simpleicons.org/greensock" width="50" height="50" alt="GSAP" />
       <br><b>GSAP</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/axios/axios/master/media/logo.png" width="50" height="50" alt="Axios" />
+      <img src="https://cdn.simpleicons.org/axios" width="50" height="50" alt="Axios" />
       <br><b>Axios</b>
     </td>
     <td align="center">
-      <img src="https://lucide.dev/octagon-smile.svg" width="50" height="50" alt="Lucide Icons" />
+      <img src="https://cdn.simpleicons.org/lucide" width="50" height="50" alt="Lucide Icons" />
       <br><b>Lucide Icons</b>
-    </td>
-    <td align="center">
-      <img src="https://raw.githubusercontent.com/lenis-scroll/lenis/main/assets/lenis-logo.svg" width="50" height="50" alt="Lenis" />
-      <br><b>Lenis</b>
     </td>
   </tr>
 </table>
 
 ### 🔧 Backend Stack
 
-<table>
+<h3 align="center">Backend</h3>
+
+<table align="center">
   <tr>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" width="50" height="50" alt="Node.js" />
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="50" height="50" alt="Node.js" />
       <br><b>Node.js</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/express/express-original.svg" width="50" height="50" alt="Express" />
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="50" height="50" alt="Express" />
       <br><b>Express 5</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mongodb/mongodb-original.svg" width="50" height="50" alt="MongoDB" />
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="50" height="50" alt="MongoDB" />
       <br><b>MongoDB</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/Automattic/mongoose/master/logo.png" width="50" height="50" alt="Mongoose" />
+      <img src="https://cdn.simpleicons.org/mongoose" width="50" height="50" alt="Mongoose" />
       <br><b>Mongoose</b>
     </td>
   </tr>
+
   <tr>
     <td align="center">
-      <img src="https://camo.githubusercontent.com/902ce99a4a39c6cdb5c6da5a1f05b1aff00f92a5a17f46f82c29a24c67eb3dd2/68747470733a2f2f68656c6d65746a732e6769746875622e696f2f696d616765732f686561646572732f7368696e79436f72652e737667" width="50" height="50" alt="Helmet" />
+      <img src="https://cdn.simpleicons.org/helmet" width="50" height="50" alt="Helmet" />
       <br><b>Helmet</b>
     </td>
     <td align="center">
-      <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/dot-net/dot-net-original.svg" width="50" height="50" alt="CORS" />
-      <br><b>CORS</b>
-    </td>
-    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/1459614?s=200&v=4" width="50" height="50" alt="Multer" />
-      <br><b>Multer</b>
-    </td>
-    <td align="center">
-      <img src="https://raw.githubusercontent.com/motdotla/dotenv/master/dotenv.svg" width="50" height="50" alt="Dotenv" />
-      <br><b>Dotenv</b>
-    </td>
+  <img src="https://img.icons8.com/ios-filled/50/ffffff/api-settings.png" width="50" height="50" alt="CORS" />
+  <br><b>CORS</b>
+</td>
+
+<td align="center">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="50" height="50" alt="Multer" />
+  <br><b>Multer</b>
+</td>
+
+<td align="center">
+  <img src="https://raw.githubusercontent.com/motdotla/dotenv/master/dotenv.svg" width="50" height="50" alt="Dotenv" />
+  <br><b>Dotenv</b>
+</td>
   </tr>
 </table>
 
