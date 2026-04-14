@@ -16,7 +16,7 @@
 
 ---
 
-## 🚀 Live Deployment
+##  Live Deployment
 
 | Platform | URL |
 |----------|-----|
@@ -25,19 +25,34 @@
 
 ---
 
-## 📌 Overview
+##  Overview
 
 **SYSC Music** is a production-ready, fully animated music streaming platform engineered with cutting-edge web technologies. Built with a focus on performance, user experience, and scalability, it delivers a seamless music discovery and playback experience.
 
-### ✨ Key Features
+###  Key Features
 
 - 🎬 **Fully Animated UI** - Smooth transitions with Framer Motion & GSAP
+- 🏁 **F1 Cinematic Intro** - 4.5s high-end F1-movie-style intro screen with GSAP & Lenis
 - 🔐 **Secure Authentication** - Google OAuth with token-based sessions
 - 🎵 **Advanced Streaming** - Optimized media endpoints with folder-based discovery
 - 📂 **Smart Playlists** - Full CRUD operations with track association
 - 🛡️ **Security Hardened** - Helmet, CORS, token validation, environment isolation
 - 💾 **Database Optimized** - MongoDB with Mongoose schemas
 - ⚡ **High Performance** - Vite-powered frontend, Express backend
+
+---
+
+## 🏁 F1 Cinematic Intro Screen
+
+**NEW:** Your app now features a production-ready **cinematic F1-movie-inspired intro screen** built with GSAP 3.12.5, pure CSS, and Lenis smooth scroll. The intro delivers:
+
+- ✨ **Speed lines, RPM counter, F1 race countdown lights, SYSC logo slam**
+- 🎥 **Film grain, scanlines, vignette, camera effects**
+- 🔴 **Ferrari red accents, glow effects, vibration feedback**
+- ♿ **Full accessibility support (ARIA labels, keyboard nav, reduced motion)**
+- 📱 **Fully responsive (desktop, tablet, mobile)**
+
+**See:** [F1_INTRO_QUICKSTART.md](./F1_INTRO_QUICKSTART.md) for customization guide or [F1_INTRO_GUIDE.md](./F1_INTRO_GUIDE.md) for complete documentation.
 
 ---
 
@@ -83,7 +98,7 @@
   </tr>
 </table>
 
-### 🔧 Backend Stack
+###  Backend Stack
 
 <h3 align="center">Backend</h3>
 
@@ -131,7 +146,7 @@
 
 ---
 
-## ⚙️ Core Highlights
+##  Core Highlights
 
 ### 🎬 Advanced Animation System
 - **Intro Screen Transitions** - Immersive entrance animations
@@ -268,12 +283,12 @@ sysc/
 
 ---
 
-## 📡 API Documentation
+##  API Documentation
 
 **Base URL (Local):** `http://localhost:5000/api`  
 **Base URL (Production):** `https://sysc-music.onrender.com/api`
 
-### 🎵 Tracks Endpoints
+###  Tracks Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|---|
@@ -281,7 +296,7 @@ sysc/
 | `/songs` | GET | Get all songs |
 | `/media/songs?folder=<folderName>` | GET | Get songs from specific folder |
 
-### 📂 Playlists Endpoints
+###  Playlists Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|---|
@@ -291,7 +306,7 @@ sysc/
 | `/playlists/:playlistId` | PATCH | Update playlist |
 | `/playlists/:playlistId` | DELETE | Delete playlist |
 
-### 🎶 Playlist Tracks Endpoints
+###  Playlist Tracks Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|---|
@@ -301,7 +316,7 @@ sysc/
 
 ---
 
-## ⚙️ Environment Configuration
+##  Environment Configuration
 
 ### Backend Configuration (`server/.env`)
 
@@ -352,7 +367,7 @@ VITE_DURATION_HYDRATION_CONCURRENCY=3
 
 ---
 
-## 🔧 Google OAuth Setup Guide
+##  Google OAuth Setup Guide
 
 ### Prerequisites
 - Google Cloud Console project
@@ -378,7 +393,7 @@ VITE_DURATION_HYDRATION_CONCURRENCY=3
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js 16+
@@ -431,7 +446,7 @@ http://localhost:5173
 
 ---
 
-## 📜 Available Scripts
+##  Available Scripts
 
 ### Frontend Scripts (`npm run <script>`)
 | Script | Purpose |
@@ -450,7 +465,7 @@ http://localhost:5173
 
 ---
 
-## 💾 Database Seeding
+##  Database Seeding
 
 To populate the database with sample music data:
 
@@ -467,7 +482,7 @@ This will:
 
 ---
 
-## 📦 Deployment
+##  Deployment
 
 ### Frontend Deployment (Vercel)
 
@@ -499,7 +514,7 @@ npm run build
 
 ---
 
-## 🎨 UI/UX Highlights
+##  UI/UX Highlights
 
 - **Responsive Design** - Works on desktop, tablet, and mobile
 - **Dark Theme** - Eye-friendly dark mode by default
@@ -510,7 +525,7 @@ npm run build
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
@@ -522,7 +537,7 @@ npm run build
 
 ---
 
-## 📚 Documentation
+##  Documentation
 
 - **[Google OAuth Setup](https://developers.google.com/identity/protocols/oauth2)**
 - **[MongoDB Documentation](https://docs.mongodb.com/)**
@@ -532,7 +547,7 @@ npm run build
 
 ---
 
-## 📄 License
+##  License
 
 ISC License - See LICENSE file for details
 

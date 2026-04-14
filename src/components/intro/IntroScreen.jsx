@@ -1,286 +1,403 @@
 import { useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
+import '../../styles/Intro.css'
 
-function IntroScreen({ onEnter }) {
-  const rootRef = useRef(null)
-  const cardRef = useRef(null)
-  const glowRef = useRef(null)
-  const orbitRef = useRef(null)
-  const enteredRef = useRef(false)
+// ─── SYSC × F1 Cinematic Intro ───────────────────────────────────────────────
+// Drop-in component. Just pass onEnter={() => setIntroComplete(true)}
+// ─────────────────────────────────────────────────────────────────────────────
+// OPTIONAL AUDIO ENHANCEMENT:
+// To add engine rev sound on countdown "GO!":
+// 1. Save your audio file: /public/audio/engine-rev.mp3 (0.5-1.5s duration)
+// 2. Uncomment the audio playback code below (search for "AUDIO_ENHANCEMENT")
+// 3. Import: import engineRevSfx from '../../../public/audio/engine-rev.mp3'
+// ─────────────────────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.intro__badge', {
-        y: 18,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-      })
-      gsap.from('.intro__signature', {
-        y: 18,
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.08,
-        ease: 'power3.out',
-      })
-      gsap.from('.intro__title', {
-        y: 20,
-        opacity: 0,
-        duration: 0.9,
-        delay: 0.12,
-        ease: 'power3.out',
-      })
-      gsap.from('.intro__subtitle', {
-        y: 18,
-        opacity: 0,
-        duration: 0.9,
-        delay: 0.18,
-        ease: 'power3.out',
-      })
-      gsap.from('.intro__card', {
-        y: 26,
-        opacity: 0,
-        duration: 1,
-        delay: 0.26,
-        ease: 'power3.out',
-      })
-      gsap.from('.intro__cta', {
-        y: 16,
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.36,
-        ease: 'power3.out',
-      })
-      gsap.from('.intro__hint', {
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.5,
-        ease: 'power3.out',
-      })
-      gsap.from('.intro__credit', {
-        y: 10,
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.58,
-        ease: 'power3.out',
-      })
+const LINE_CONFIGS = Array.from({ length: 20 }, (_, i) => ({
+  height : i % 4 === 0 ? '2.5px' : i % 3 === 0 ? '1.5px' : '1px',
+  width  : `${38 + (i * 3.7) % 44}%`,
+  opacity: 0.25 + (i % 6) * 0.10,
+  top    : `${i * 5 + (i % 3) * 0.6 + 1.2}%`,
+  color  : i % 7 === 0 ? '#E10600' : '#ffffff',
+}))
 
-      gsap.to('.intro__glow', {
-        opacity: 0.9,
-        duration: 2.4,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-      })
+export default function IntroScreen({ onEnter }) {
+  const rootRef     = useRef(null)
+  const enteredRef  = useRef(false)
+  const tlRef       = useRef(null)
+  const rpmRafRef   = useRef(null)
+  const timerRafRef = useRef(null)
 
-      if (orbitRef.current) {
-        gsap.to(orbitRef.current, {
-          rotate: 360,
-          duration: 18,
-          ease: 'none',
-          repeat: -1,
-        })
-      }
-    }, rootRef)
+  // ── Safe Enter ───────────────────────────────────────────────────────────
+  const safeEnter = () => {
+    if (enteredRef.current) return
+    enteredRef.current = true
+    tlRef.current?.kill()
+    if (rpmRafRef.current)   cancelAnimationFrame(rpmRafRef.current)
+    if (timerRafRef.current) cancelAnimationFrame(timerRafRef.current)
 
-    return () => ctx.revert()
-  }, [])
+    const root = rootRef.current
+    if (!root) { onEnter?.(); return }
 
-  useEffect(() => {
-    const card = cardRef.current
-    const glow = glowRef.current
-    if (!card || !glow) return
-
-    const handleMove = (event) => {
-      const point = event.touches ? event.touches[0] : event
-      if (!point) return
-      const rect = card.getBoundingClientRect()
-      const x = point.clientX - rect.left - rect.width / 2
-      const y = point.clientY - rect.top - rect.height / 2
-      const rotateX = gsap.utils.clamp(-12, 12, (-y / rect.height) * 22)
-      const rotateY = gsap.utils.clamp(-16, 16, (x / rect.width) * 22)
-
-      gsap.to(card, {
-        rotateX,
-        rotateY,
-        duration: 0.6,
-        ease: 'power3.out',
-      })
-
-      gsap.to(glow, {
-        x: x * 0.12,
-        y: y * 0.12,
-        duration: 0.6,
-        ease: 'power3.out',
-      })
+    // Optional: Trigger subtle vibration if supported
+    if (navigator?.vibrate) {
+      navigator.vibrate([10, 5, 10])
     }
 
-    const handleLeave = () => {
-      gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.8, ease: 'power3.out' })
-      gsap.to(glow, { x: 0, y: 0, duration: 0.8, ease: 'power3.out' })
+    // Scan line sweep on exit
+    const scan = root.querySelector('.f1i__scan-line')
+    gsap.fromTo(scan,
+      { top: '0%', autoAlpha: 1 },
+      { top: '100%', duration: 0.4, ease: 'power2.in' }
+    )
+
+    // Flash the enter button on click
+    const btn = root.querySelector('.f1i__enter')
+    gsap.to(btn, { opacity: 0.6, duration: 0.12, ease: 'power2.in' })
+
+    gsap.to(root, {
+      yPercent : -105,
+      duration : 0.72,
+      delay    : 0.18,
+      ease     : 'power4.inOut',
+      onComplete: onEnter,
+    })
+  }
+
+  // ── RPM counter ──────────────────────────────────────────────────────────
+  const animateRpm = (from, to, ms, el) => {
+    if (!el) return
+    const start = performance.now()
+    const barFill = rootRef.current?.querySelector('.f1i__rpm-bar-fill')
+    const tick = (now) => {
+      const t      = Math.min((now - start) / ms, 1)
+      const eased  = 1 - (1 - t) * (1 - t)
+      const val    = Math.round(from + (to - from) * eased)
+      el.textContent = String(val).padStart(4, '0')
+      if (barFill) barFill.style.width = `${(val / 9500) * 100}%`
+      if (t < 1)   rpmRafRef.current = requestAnimationFrame(tick)
+      else         el.textContent = String(to).padStart(4, '0')
     }
+    rpmRafRef.current = requestAnimationFrame(tick)
+  }
 
-    card.addEventListener('mousemove', handleMove)
-    card.addEventListener('mouseleave', handleLeave)
-    card.addEventListener('touchmove', handleMove)
-    card.addEventListener('touchend', handleLeave)
-
-    return () => {
-      card.removeEventListener('mousemove', handleMove)
-      card.removeEventListener('mouseleave', handleLeave)
-      card.removeEventListener('touchmove', handleMove)
-      card.removeEventListener('touchend', handleLeave)
+  // ── Telemetry lap timer ──────────────────────────────────────────────────
+  const startTimer = (el) => {
+    if (!el) return
+    const start = performance.now()
+    const tick = (now) => {
+      const ms       = Math.round(now - start)
+      const mins     = String(Math.floor(ms / 60000)).padStart(2, '0')
+      const secs     = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')
+      const centis   = String(Math.floor((ms % 1000) / 10)).padStart(3, '0')
+      el.textContent = `${mins}:${secs}.${centis}`
+      timerRafRef.current = requestAnimationFrame(tick)
     }
-  }, [])
+    timerRafRef.current = requestAnimationFrame(tick)
+  }
 
+  // ── Main Timeline ────────────────────────────────────────────────────────
   useEffect(() => {
     const root = rootRef.current
     if (!root) return
 
-    const handleMove = (event) => {
-      const point = event.touches ? event.touches[0] : event
-      if (!point) return
-      const bounds = root.getBoundingClientRect()
-      const x = ((point.clientX - bounds.left) / bounds.width - 0.5) * 2
-      const y = ((point.clientY - bounds.top) / bounds.height - 0.5) * 2
-      root.style.setProperty('--mx', x.toFixed(3))
-      root.style.setProperty('--my', y.toFixed(3))
-    }
+    const q = (s) => root.querySelector(s)
+    const qa = (s) => Array.from(root.querySelectorAll(s))
 
-    const handleLeave = () => {
-      root.style.setProperty('--mx', '0')
-      root.style.setProperty('--my', '0')
-    }
+    const flash     = q('.f1i__flash')
+    const lines     = qa('.f1i__speed-line')
+    const rpmEl     = q('.f1i__rpm-value')
+    const rpmWrap   = q('.f1i__rpm')
+    const letters   = qa('.f1i__letter')
+    const stripe    = q('.f1i__stripe')
+    const tagline   = q('.f1i__tagline')
+    const enterBtn  = q('.f1i__enter')
+    const countdown = q('.f1i__countdown')
+    const dots      = qa('.f1i__light')
+    const countNum  = q('.f1i__count-num')
+    const telemetry = q('.f1i__telemetry')
+    const timerEl   = q('.f1i__telemetry-timer')
+    const scanLine  = q('.f1i__scan-line')
+    const corners   = qa('.f1i__corner')
+    const bgGrid    = q('.f1i__bg-grid')
 
-    root.addEventListener('mousemove', handleMove)
-    root.addEventListener('mouseleave', handleLeave)
-    root.addEventListener('touchmove', handleMove)
-    root.addEventListener('touchend', handleLeave)
+    // ── Initial states ────────────────────────────────────────────────────
+    gsap.set(flash,     { autoAlpha: 0 })
+    gsap.set(lines,     { xPercent: -110 })
+    gsap.set(rpmWrap,   { autoAlpha: 0, y: -8 })
+    gsap.set(letters,   { y: -160, autoAlpha: 0, rotateX: -25 })
+    gsap.set(stripe,    { scaleX: 0, transformOrigin: 'left center', autoAlpha: 0 })
+    gsap.set(tagline,   { autoAlpha: 0, y: 14 })
+    gsap.set(enterBtn,  { autoAlpha: 0, y: 8 })
+    gsap.set(countdown, { autoAlpha: 0 })
+    gsap.set(telemetry, { autoAlpha: 0, y: 12 })
+    gsap.set(scanLine,  { autoAlpha: 0 })
+    gsap.set(corners,   { autoAlpha: 0, scale: 1.4 })
+    gsap.set(bgGrid,    { autoAlpha: 0 })
+
+    // ── Timeline ──────────────────────────────────────────────────────────
+    const tl = gsap.timeline({ paused: true })
+    tlRef.current = tl
+
+    // 1 ── Camera shutter flash ────────────────────────────────────────────
+    tl.set(flash, { autoAlpha: 1 })
+      .to(flash, { autoAlpha: 0, duration: 0.06, ease: 'none' }, '+=0.04')
+      .set(flash, { autoAlpha: 0.7 })
+      .to(flash, { autoAlpha: 0, duration: 0.07, ease: 'none' }, '+=0.03')
+      .set(flash, { autoAlpha: 1 })
+      .to(flash, { autoAlpha: 0, duration: 0.12, ease: 'none' }, '+=0.03')
+
+    // 2 ── BG grid + corners fade in ───────────────────────────────────────
+    tl.to(bgGrid, { autoAlpha: 1, duration: 0.6, ease: 'power2.out' }, '-=0.05')
+    tl.to(corners, {
+      autoAlpha : 1,
+      scale     : 1,
+      duration  : 0.4,
+      stagger   : 0.06,
+      ease      : 'power3.out',
+    }, '<0.1')
+
+    // 3 ── Speed lines shoot across ────────────────────────────────────────
+    tl.to(lines, {
+      xPercent : 130,
+      duration : 0.48,
+      stagger  : 0.022,
+      ease     : 'power3.in',
+    }, '-=0.2')
+
+    // 4 ── RPM counter ─────────────────────────────────────────────────────
+    tl.to(rpmWrap, {
+      autoAlpha : 1,
+      y         : 0,
+      duration  : 0.22,
+      ease      : 'power2.out',
+    }, '-=0.14')
+    tl.add(() => animateRpm(0, 9500, 1050, rpmEl), '<')
+
+    // 5 ── Countdown lights ────────────────────────────────────────────────
+    tl.to(countdown, {
+      autoAlpha : 1,
+      duration  : 0.2,
+      ease      : 'power2.out',
+    }, '+=0.2')
+
+    dots.forEach((dot, i) => {
+      tl.to(dot, {
+        backgroundColor : '#E10600',
+        boxShadow       : '0 0 28px 10px rgba(225,6,0,0.8)',
+        duration        : 0.15,
+        ease            : 'power2.out',
+      }, '+=0.26')
+      if (i === 1) tl.add(() => { if (countNum) countNum.textContent = '3' }, '<0.05')
+      if (i === 2) tl.add(() => { if (countNum) countNum.textContent = '2' }, '<0.05')
+      if (i === 3) tl.add(() => { if (countNum) countNum.textContent = '1' }, '<0.05')
+    })
+
+    // Lights out + GO!
+    tl.to(dots, {
+      backgroundColor : '#1a0000',
+      boxShadow       : 'none',
+      duration        : 0.12,
+      stagger         : 0.035,
+      ease            : 'power4.in',
+    }, '+=0.22')
+    tl.add(() => { if (countNum) countNum.textContent = 'GO!' }, '<0.04')
+
+    // AUDIO_ENHANCEMENT: Uncomment to play engine rev sound on GO!
+    // tl.add(() => {
+    //   const audio = new Audio(engineRevSfx)
+    //   audio.volume = 0.4
+    //   audio.play().catch(() => {})
+    // }, '<0.02')
+
+    // Flash red on GO!
+    tl.set(flash, { autoAlpha: 0.15, background: '#E10600' })
+    tl.to(flash, { autoAlpha: 0, duration: 0.3, ease: 'power2.out' }, '+=0.05')
+    tl.to(countdown, { autoAlpha: 0, y: -28, duration: 0.36, ease: 'power3.in' }, '+=0.28')
+
+    // 6 ── SYSC letters slam ───────────────────────────────────────────────
+    tl.to(letters, {
+      y        : 0,
+      autoAlpha: 1,
+      rotateX  : 0,
+      duration : 0.44,
+      stagger  : 0.09,
+      ease     : 'power4.out',
+    }, '-=0.1')
+
+    // Camera shake when S slams
+    tl.to(root, {
+      keyframes: [
+        { x:  7, y: -3, duration: 0.045 },
+        { x: -5, y:  2, duration: 0.045 },
+        { x:  4, y: -1, duration: 0.04  },
+        { x: -2, y:  1, duration: 0.04  },
+        { x:  0, y:  0, duration: 0.035 },
+      ],
+      ease: 'none',
+    }, '<0.05')
+
+    // 7 ── Red stripe sweeps in ────────────────────────────────────────────
+    tl.to(stripe, {
+      autoAlpha : 1,
+      scaleX    : 1,
+      duration  : 0.38,
+      ease      : 'power4.out',
+    }, '-=0.06')
+
+    // 8 ── Tagline + telemetry ─────────────────────────────────────────────
+    tl.to(tagline, {
+      autoAlpha : 1,
+      y         : 0,
+      duration  : 0.44,
+      ease      : 'power3.out',
+    }, '+=0.04')
+
+    tl.to(telemetry, {
+      autoAlpha : 1,
+      y         : 0,
+      duration  : 0.4,
+      ease      : 'power2.out',
+    }, '<0.12')
+    tl.add(() => startTimer(timerEl), '<')
+
+    // 9 ── Scan line drops once across screen ─────────────────────────────
+    tl.fromTo(scanLine,
+      { autoAlpha: 1, top: '0%' },
+      { top: '100%', duration: 1.1, ease: 'power1.inOut', autoAlpha: 1 },
+      '<'
+    )
+
+    // 10 ── Enter button pulses in ─────────────────────────────────────────
+    tl.to(enterBtn, { autoAlpha: 1, y: 0, duration: 0.3, ease: 'power2.out' }, '+=0.06')
+    tl.to(enterBtn, { scale: 1.06, duration: 0.18, ease: 'power2.out' })
+    tl.to(enterBtn, { scale: 1.00, duration: 0.16, ease: 'power2.in'  })
+    tl.to(enterBtn, { scale: 1.04, duration: 0.16, ease: 'power2.out' })
+    tl.to(enterBtn, { scale: 1.00, duration: 0.16, ease: 'power2.in'  })
+
+    tl.play()
+
+    // Keyboard shortcut
+    const onKey = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); safeEnter() }
+    }
+    window.addEventListener('keydown', onKey)
 
     return () => {
-      root.removeEventListener('mousemove', handleMove)
-      root.removeEventListener('mouseleave', handleLeave)
-      root.removeEventListener('touchmove', handleMove)
-      root.removeEventListener('touchend', handleLeave)
+      tl.kill()
+      if (rpmRafRef.current)   cancelAnimationFrame(rpmRafRef.current)
+      if (timerRafRef.current) cancelAnimationFrame(timerRafRef.current)
+      window.removeEventListener('keydown', onKey)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const safeEnter = () => {
-    if (enteredRef.current) return
-    enteredRef.current = true
-    onEnter()
-  }
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      safeEnter()
-    }, 4800)
-
-    return () => window.clearTimeout(timer)
-  }, [])
-
-  useEffect(() => {
-    const handleKey = (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault()
-        safeEnter()
-      }
-    }
-
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [])
-
+  // ── JSX ──────────────────────────────────────────────────────────────────
   return (
-    <motion.section
-      className="intro"
-      ref={rootRef}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: [0.22, 0.61, 0.36, 1] }}
-    >
-      <div className="intro__glow" />
-      <div className="intro__nebula" />
-      <div className="intro__grid" />
-      <div className="intro__speed" />
-      <div className="intro__lines">
-        <span />
-        <span />
-        <span />
-      </div>
-      <div className="intro__core" aria-hidden="true">
-        <span />
-        <span />
-      </div>
-      <div className="intro__hud intro__hud--left">
-        <div className="intro__hud-item">
-          <span className="intro__hud-label">Lap</span>
-          <span className="intro__hud-value">01</span>
-        </div>
-        <div className="intro__hud-item">
-          <span className="intro__hud-label">Sector</span>
-          <span className="intro__hud-value">2.14</span>
-        </div>
-      </div>
-      <div className="intro__hud intro__hud--right">
-        <div className="intro__hud-item">
-          <span className="intro__hud-label">Velocity</span>
-          <span className="intro__hud-value">312</span>
-        </div>
-        <div className="intro__hud-item intro__hud-item--accent">
-          <span className="intro__hud-label">Engine</span>
-          <span className="intro__hud-value">E9</span>
-        </div>
-      </div>
-      <div className="intro__telemetry">
-        <span className="intro__telemetry-dot" />
-        <span>Telemetry Online</span>
-      </div>
-      <div className="intro__content">
-        <div className="intro__badge">SYSC</div>
-        <div className="intro__signature">Systemic Sound Collective</div>
-        <h1 className="intro__title" data-text="SYSC">SYSC</h1>
-        <p className="intro__subtitle">Cinematic Sound Suite</p>
+    <div className="f1i" ref={rootRef} role="region" aria-label="SYSC Intro">
 
-        <div className="intro__card" ref={cardRef}>
-          <div className="intro__card-glow" ref={glowRef} />
-          <div className="intro__orbit" ref={orbitRef}>
-            <span />
-            <span />
-          </div>
-          <div className="intro__card-inner">
-            <div className="intro__card-label">Now Curated</div>
-            <div className="intro__card-title">Yours Truly</div>
-            <div className="intro__card-meta">Lossless - Focus Sessions</div>
-            <div className="intro__card-progress">
-              <div className="progress progress--full">
-                <span className="progress__fill progress--72" />
-              </div>
+      {/* Overlays */}
+      <div className="f1i__flash"     aria-hidden="true" />
+      <div className="f1i__grain"     aria-hidden="true" />
+      <div className="f1i__scanlines" aria-hidden="true" />
+      <div className="f1i__vignette"  aria-hidden="true" />
+      <div className="f1i__bg-grid"   aria-hidden="true" />
+      <div className="f1i__scan-line" aria-hidden="true" />
+
+      {/* Viewfinder corners */}
+      <div className="f1i__corner f1i__corner--tl" aria-hidden="true" />
+      <div className="f1i__corner f1i__corner--tr" aria-hidden="true" />
+      <div className="f1i__corner f1i__corner--bl" aria-hidden="true" />
+      <div className="f1i__corner f1i__corner--br" aria-hidden="true" />
+
+      {/* ● REC — top left */}
+      <div className="f1i__rec" aria-label="Recording indicator">
+        <span className="f1i__rec-dot" aria-hidden="true" />
+        <span className="f1i__rec-label">REC</span>
+      </div>
+
+      {/* RPM — top right */}
+      <div className="f1i__rpm" aria-live="polite" aria-label="RPM">
+        <span className="f1i__rpm-label">RPM</span>
+        <span className="f1i__rpm-value">0000</span>
+        <div className="f1i__rpm-bar-track" aria-hidden="true">
+          <div className="f1i__rpm-bar-fill" />
+        </div>
+      </div>
+
+      {/* Speed lines */}
+      <div className="f1i__speed-lines" aria-hidden="true">
+        {LINE_CONFIGS.map(({ height, width, opacity, top, color }, i) => (
+          <div
+            key={i}
+            className="f1i__speed-line"
+            style={{ height, width, opacity, top, '--line-color': color }}
+          />
+        ))}
+      </div>
+
+      {/* Countdown */}
+      <div className="f1i__countdown" aria-live="polite" aria-label="Race start">
+        <div className="f1i__lights-row" aria-hidden="true">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="f1i__light">
+              <div className="f1i__light-inner" />
             </div>
-            <div className="intro__card-footer">
-              <span>24-bit</span>
-              <span>48k</span>
-              <span>Spatial</span>
-            </div>
-          </div>
+          ))}
+        </div>
+        <div className="f1i__count-num" aria-atomic="true">3</div>
+      </div>
+
+      {/* Main Stage */}
+      <div className="f1i__stage">
+
+        {/* SYSC Logo */}
+        <div className="f1i__logo-wrap">
+          <div className="f1i__logo-pre" aria-hidden="true">MUSIC PLATFORM</div>
+          <h1 className="f1i__logo" aria-label="SYSC">
+            {['S', 'Y', 'S', 'C'].map((ch, i) => (
+              <span key={i} className="f1i__letter" aria-hidden="true">{ch}</span>
+            ))}
+          </h1>
         </div>
 
-        <motion.button
-          className="intro__cta primary-button"
+        {/* Red stripe */}
+        <div className="f1i__stripe" aria-hidden="true">
+          <div className="f1i__stripe-glow" />
+        </div>
+
+        {/* Tagline */}
+        <p className="f1i__tagline">WHERE MUSIC HITS DIFFERENT</p>
+
+        {/* Enter */}
+        <button
+          className="f1i__enter"
           type="button"
           onClick={safeEnter}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          aria-label="Enter SYSC Music Platform"
         >
-          Enter SYSC
-        </motion.button>
-        <p className="intro__hint">Move your cursor or press Enter</p>
-        <p className="intro__credit">Developed by Vineet Dwivedi</p>
+          <span className="f1i__enter-fill" aria-hidden="true" />
+          <span className="f1i__enter-text">ENTER THE ZONE</span>
+          <span className="f1i__enter-arrow" aria-hidden="true">→</span>
+        </button>
+
+        <p className="f1i__hint" aria-label="Keyboard shortcut">
+          PRESS <kbd>SPACE</kbd> OR <kbd>ENTER</kbd>
+        </p>
       </div>
-    </motion.section>
+
+      {/* Telemetry bar — bottom */}
+      <div className="f1i__telemetry" aria-hidden="true">
+        <span className="f1i__tele-item">LAP <strong>01</strong></span>
+        <span className="f1i__tele-sep">|</span>
+        <span className="f1i__tele-item">SECTOR <strong>02</strong></span>
+        <span className="f1i__tele-sep">|</span>
+        <span className="f1i__tele-timer f1i__telemetry-timer">00:00.000</span>
+        <span className="f1i__tele-sep">|</span>
+        <span className="f1i__tele-item f1i__tele-pos">P<strong>1</strong></span>
+        <span className="f1i__tele-sep">|</span>
+        <span className="f1i__tele-item">SYSC MUSIC <strong>v2.0</strong></span>
+      </div>
+
+    </div>
   )
 }
-
-export default IntroScreen
