@@ -37,6 +37,9 @@ function AppShell({ c }) {
   useEffect(() => {
     if (!c.themeTransition || typeof window === 'undefined') return undefined
 
+    const shell = appShellRef.current
+    if (!(shell instanceof HTMLElement)) return undefined
+
     const transitionTheme = c.themeTransition.toTheme ?? c.theme
 
     const ctx = gsap.context(() => {
@@ -60,7 +63,7 @@ function AppShell({ c }) {
           duration: 0.72,
           ease: 'power3.out',
         })
-    }, appShellRef)
+    }, shell)
 
     return () => ctx.revert()
   }, [c.theme, c.themeTransition])
@@ -349,169 +352,178 @@ function AppShell({ c }) {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      {c.introComplete ? (
-        <motion.div
-          key="app"
-          ref={appShellRef}
-          className="app-shell"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
-        >
-          <div className="app">
-            <AppBackground />
-            <main className="main">
-              <Topbar
-                onSearchOpen={() => c.setSearchOpen(true)}
-                onNavigate={c.navigate}
-                onLogout={c.handleLogout}
-                theme={c.theme}
-                onThemeToggle={c.handleThemeToggle}
-              />
-              <div className="page-stack" ref={pageStackRef}>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={c.activePage}
-                    className="page-motion"
-                    initial={c.pageTransition.initial}
-                    animate={c.pageTransition.animate}
-                    exit={c.pageTransition.exit}
-                    transition={c.pageTransition.transition}
-                  >
-                    {renderPage()}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </main>
+    <>
+      <AnimatePresence mode="wait">
+        {c.introComplete ? (
+          <motion.div
+            key="app"
+            ref={appShellRef}
+            className="app-shell"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            <div className="app">
+              <AppBackground />
+              <main className="main">
+                <Topbar
+                  onSearchOpen={() => c.setSearchOpen(true)}
+                  onNavigate={c.navigate}
+                  onLogout={c.handleLogout}
+                  theme={c.theme}
+                  onThemeToggle={c.handleThemeToggle}
+                />
+                <div className="page-stack" ref={pageStackRef}>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={c.activePage}
+                      className="page-motion"
+                      initial={c.pageTransition.initial}
+                      animate={c.pageTransition.animate}
+                      exit={c.pageTransition.exit}
+                      transition={c.pageTransition.transition}
+                    >
+                      {renderPage()}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </main>
 
-            <MiniPlayer
-              isHidden={c.playerExpanded}
-              onExpand={() => c.setPlayerExpanded(true)}
-              track={c.currentTrack}
-              trackImage={c.currentTrackImage}
-              isPlaying={c.isPlaying}
-              isShuffleEnabled={c.isShuffleEnabled}
-              loopMode={c.loopMode}
-              onPlayToggle={c.handleTogglePlay}
-              onNext={c.handleNext}
-              onPrev={c.handlePrev}
-              onToggleShuffle={c.handleToggleShuffle}
-              onCycleLoopMode={c.handleCycleLoopMode}
-              progress={c.progressPercent}
-              onSeek={c.handleSeek}
-              volumePercent={c.volumePercent}
-              onVolumeChange={c.handleVolumeChange}
-            />
-            {c.currentTrack?.audioUrl ? (
-              <audio
-                ref={c.audioRef}
-                src={c.currentTrack.audioUrl}
-                preload="metadata"
-                onEnded={c.handleTrackEnd}
+              <MiniPlayer
+                isHidden={c.playerExpanded}
+                onExpand={() => c.setPlayerExpanded(true)}
+                track={c.currentTrack}
+                trackImage={c.currentTrackImage}
+                isPlaying={c.isPlaying}
+                isShuffleEnabled={c.isShuffleEnabled}
+                loopMode={c.loopMode}
+                onPlayToggle={c.handleTogglePlay}
+                onNext={c.handleNext}
+                onPrev={c.handlePrev}
+                onToggleShuffle={c.handleToggleShuffle}
+                onCycleLoopMode={c.handleCycleLoopMode}
+                progress={c.progressPercent}
+                onSeek={c.handleSeek}
+                volumePercent={c.volumePercent}
+                onVolumeChange={c.handleVolumeChange}
               />
-            ) : null}
+              {c.currentTrack?.audioUrl ? (
+                <audio
+                  ref={c.audioRef}
+                  src={c.currentTrack.audioUrl}
+                  preload="metadata"
+                  onEnded={c.handleTrackEnd}
+                />
+              ) : null}
 
-            <PlayerOverlay
-              isOpen={c.playerExpanded}
-              onClose={() => c.setPlayerExpanded(false)}
-              track={c.currentTrack}
-              trackImage={c.currentTrackImage}
-              isPlaying={c.isPlaying}
-              isShuffleEnabled={c.isShuffleEnabled}
-              loopMode={c.loopMode}
-              onPlayToggle={c.handleTogglePlay}
-              onNext={c.handleNext}
-              onPrev={c.handlePrev}
-              onToggleShuffle={c.handleToggleShuffle}
-              onCycleLoopMode={c.handleCycleLoopMode}
-              onAddToQueue={c.handleAddToQueue}
-              onShare={c.handleShare}
-              progress={c.progressPercent}
-              currentTimeLabel={c.playbackTimeLabel}
-              durationLabel={c.playbackDurationLabel}
-              onSeek={c.handleSeek}
-              volumePercent={c.volumePercent}
-              onVolumeChange={c.handleVolumeChange}
-            />
-            <SearchOverlay
-              isOpen={c.searchOpen}
-              onClose={c.handleSearchClose}
-              results={c.filteredSearchResults}
-              query={c.searchQuery}
-              onQueryChange={c.setSearchQuery}
-              onOpenResult={c.handleOpenSearchResult}
-            />
-            <CreatePlaylistOverlay
-              isOpen={c.createPlaylistOpen}
-              name={c.playlistDraftName}
-              tracks={c.createPlaylistTrackOptions}
-              selectedTrackIds={c.selectedTrackIds}
-              onNameChange={c.setPlaylistDraftName}
-              onToggleTrack={c.handleToggleCreatePlaylistTrack}
-              onClose={c.handleCloseCreatePlaylist}
-              onCreate={c.handleCreatePlaylist}
-            />
-            <DeletePlaylistOverlay
-              isOpen={Boolean(c.deletePlaylistName)}
-              playlistName={c.deletePlaylistName}
-              onCancel={c.handleCancelDeletePlaylist}
-              onConfirm={c.handleConfirmDeletePlaylist}
-            />
-            <SettingsOverlay
-              isOpen={c.settingsOpen}
-              onClose={() => c.setSettingsOpen(false)}
-              settings={c.settings}
-              onToggleSetting={c.handleToggleSetting}
-            />
-          </div>
-          <ToastStack toasts={c.toasts} onDismiss={c.dismissToast} />
-          <VolumeHud value={c.volumeHudValue} isVisible={c.volumeHudVisible} />
-          <AnimatePresence>
-            {c.themeTransition ? (
-              <motion.div
-                key={`theme-${c.themeTransition.id}`}
-                ref={themeBloomRef}
-                className={`theme-bloom theme-bloom--${c.themeTransition.toTheme}`}
-                style={{
-                  '--theme-origin-x': `${c.themeTransition.x}px`,
-                  '--theme-origin-y': `${c.themeTransition.y}px`,
-                  '--theme-max-radius': `${c.themeTransition.radius}px`,
-                }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: prefersReducedMotion ? 0.12 : 0.3 } }}
-                transition={{ duration: prefersReducedMotion ? 0.12 : 0.22, ease: [0.22, 0.61, 0.36, 1] }}
-              >
-                <div className="theme-bloom__halo" />
-                <div className="theme-bloom__veil" />
-                <div className="theme-bloom__sheen" />
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-          <AnimatePresence>
-            {c.wipeActive ? (
-              <motion.div
-                key="wipe"
-                className="lens-wipe"
-                initial={{ scaleX: 0, opacity: 0.9 }}
-                animate={{ scaleX: 1, opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.9, ease: [0.22, 0.61, 0.36, 1] }}
-                style={{ originX: 0 }}
-              >
-                <div className="lens-wipe__beam" />
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-          <AnimatePresence>
-            {c.isLoading ? <LoadingScreen /> : null}
-          </AnimatePresence>
-        </motion.div>
-      ) : (
-        <IntroScreen key="intro" onEnter={c.handleEnter} />
-      )}
-    </AnimatePresence>
+              <PlayerOverlay
+                isOpen={c.playerExpanded}
+                onClose={() => c.setPlayerExpanded(false)}
+                track={c.currentTrack}
+                trackImage={c.currentTrackImage}
+                isPlaying={c.isPlaying}
+                isShuffleEnabled={c.isShuffleEnabled}
+                loopMode={c.loopMode}
+                onPlayToggle={c.handleTogglePlay}
+                onNext={c.handleNext}
+                onPrev={c.handlePrev}
+                onToggleShuffle={c.handleToggleShuffle}
+                onCycleLoopMode={c.handleCycleLoopMode}
+                onAddToQueue={c.handleAddToQueue}
+                onShare={c.handleShare}
+                progress={c.progressPercent}
+                currentTimeLabel={c.playbackTimeLabel}
+                durationLabel={c.playbackDurationLabel}
+                onSeek={c.handleSeek}
+                volumePercent={c.volumePercent}
+                onVolumeChange={c.handleVolumeChange}
+              />
+              <SearchOverlay
+                isOpen={c.searchOpen}
+                onClose={c.handleSearchClose}
+                results={c.filteredSearchResults}
+                query={c.searchQuery}
+                onQueryChange={c.setSearchQuery}
+                onOpenResult={c.handleOpenSearchResult}
+              />
+              <CreatePlaylistOverlay
+                isOpen={c.createPlaylistOpen}
+                name={c.playlistDraftName}
+                tracks={c.createPlaylistTrackOptions}
+                selectedTrackIds={c.selectedTrackIds}
+                onNameChange={c.setPlaylistDraftName}
+                onToggleTrack={c.handleToggleCreatePlaylistTrack}
+                onClose={c.handleCloseCreatePlaylist}
+                onCreate={c.handleCreatePlaylist}
+              />
+              <DeletePlaylistOverlay
+                isOpen={Boolean(c.deletePlaylistName)}
+                playlistName={c.deletePlaylistName}
+                onCancel={c.handleCancelDeletePlaylist}
+                onConfirm={c.handleConfirmDeletePlaylist}
+              />
+              <SettingsOverlay
+                isOpen={c.settingsOpen}
+                onClose={() => c.setSettingsOpen(false)}
+                settings={c.settings}
+                onToggleSetting={c.handleToggleSetting}
+              />
+            </div>
+            <ToastStack toasts={c.toasts} onDismiss={c.dismissToast} />
+            <VolumeHud value={c.volumeHudValue} isVisible={c.volumeHudVisible} />
+            <AnimatePresence>
+              {c.wipeActive ? (
+                <motion.div
+                  key="wipe"
+                  className="lens-wipe"
+                  initial={{ scaleX: 0, opacity: 0.9 }}
+                  animate={{ scaleX: 1, opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.9, ease: [0.22, 0.61, 0.36, 1] }}
+                  style={{ originX: 0 }}
+                >
+                  <div className="lens-wipe__beam" />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+            <AnimatePresence>
+              {c.isLoading ? <LoadingScreen /> : null}
+            </AnimatePresence>
+          </motion.div>
+        ) : (
+          <IntroScreen
+            key="intro"
+            onEnter={c.handleEnter}
+            theme={c.theme}
+            onThemeToggle={c.handleThemeToggle}
+            isThemeTransitioning={Boolean(c.themeTransition)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {c.themeTransition ? (
+          <motion.div
+            key={`theme-${c.themeTransition.id}`}
+            ref={themeBloomRef}
+            className={`theme-bloom theme-bloom--${c.themeTransition.toTheme}`}
+            style={{
+              '--theme-origin-x': `${c.themeTransition.x}px`,
+              '--theme-origin-y': `${c.themeTransition.y}px`,
+              '--theme-max-radius': `${c.themeTransition.radius}px`,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: prefersReducedMotion ? 0.12 : 0.3 } }}
+            transition={{ duration: prefersReducedMotion ? 0.12 : 0.22, ease: [0.22, 0.61, 0.36, 1] }}
+          >
+            <div className="theme-bloom__halo" />
+            <div className="theme-bloom__veil" />
+            <div className="theme-bloom__sheen" />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </>
   )
 }
 

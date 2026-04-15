@@ -42,7 +42,12 @@ const SUPPORT_CARDS = [
 const pad = (value, size) => String(Math.max(0, Math.round(value))).padStart(size, '0')
 const lenisEase = (value) => 1 - Math.pow(1 - value, 4)
 
-export default function IntroScreen({ onEnter }) {
+export default function IntroScreen({
+  onEnter,
+  theme = 'ultra',
+  onThemeToggle,
+  isThemeTransitioning = false,
+}) {
   const wrapperRef = useRef(null)
   const sceneRef = useRef(null)
   const rootRef = useRef(null)
@@ -58,6 +63,7 @@ export default function IntroScreen({ onEnter }) {
   const [isReady, setIsReady] = useState(false)
   const [isEntering, setIsEntering] = useState(false)
   const prefersReducedMotion = useReducedMotion()
+  const isUltraTheme = theme === 'ultra'
 
   const handleEnter = useCallback(() => {
     if (isEntering) return
@@ -118,6 +124,14 @@ export default function IntroScreen({ onEnter }) {
         duration: 0.2,
       }, 0)
   }, [isEntering, onEnter, prefersReducedMotion])
+
+  const handleThemeToggleClick = useCallback((event) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    onThemeToggle?.({
+      x: bounds.left + bounds.width / 2,
+      y: bounds.top + bounds.height / 2,
+    })
+  }, [onThemeToggle])
 
   useEffect(() => {
     if (!isReady || isEntering || typeof window === 'undefined') return undefined
@@ -198,7 +212,7 @@ export default function IntroScreen({ onEnter }) {
       gsap.set(q('.f1i__launch-wash'), { xPercent: -120, opacity: 0 })
       gsap.set(q('.f1i__grid'), { opacity: 0, scale: 1.03 })
       gsap.set(q('.f1i__track, .f1i__track-glow, .f1i__marker, .f1i__speed-line'), { opacity: 0 })
-      gsap.set(q('.f1i__hud-chip, .f1i__hud-pill, .f1i__eyebrow, .f1i__lights, .f1i__status, .f1i__subcopy, .f1i__support-card, .f1i__cta, .f1i__footer'), {
+      gsap.set(q('.f1i__hud-chip, .f1i__hud-pill, .f1i__theme-toggle, .f1i__eyebrow, .f1i__lights, .f1i__status, .f1i__subcopy, .f1i__support-card, .f1i__cta, .f1i__footer'), {
         opacity: 0,
         y: 22,
       })
@@ -214,8 +228,8 @@ export default function IntroScreen({ onEnter }) {
         transformOrigin: '0% 50%',
       })
       gsap.set(q('.f1i__light'), {
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 0 0 0 rgba(225, 6, 0, 0)',
+        backgroundColor: 'var(--intro-light-off)',
+        boxShadow: '0 0 0 0 transparent',
         scale: 0.84,
       })
 
@@ -290,7 +304,7 @@ export default function IntroScreen({ onEnter }) {
           },
           ease: 'power3.out',
         }, 0.24)
-        .to(q('.f1i__hud-chip, .f1i__hud-pill'), {
+        .to(q('.f1i__hud-chip, .f1i__hud-pill, .f1i__theme-toggle'), {
           opacity: 1,
           y: 0,
           duration: 0.32,
@@ -316,8 +330,8 @@ export default function IntroScreen({ onEnter }) {
         }, 0.48)
         .call(() => setStatus('Grid lights armed'), null, 0.7)
         .to(q('.f1i__light'), {
-          backgroundColor: 'rgba(225, 6, 0, 0.98)',
-          boxShadow: '0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 22px rgba(225, 6, 0, 0.7)',
+          backgroundColor: 'var(--intro-light-on)',
+          boxShadow: '0 0 0 1px var(--intro-light-ring), 0 0 22px var(--intro-light-glow)',
           scale: 1,
           duration: 0.12,
           stagger: 0.13,
@@ -487,6 +501,83 @@ export default function IntroScreen({ onEnter }) {
                 REC LIVE
               </div>
               <div className="f1i__hud-chip">LAP 01 / NIGHT RUN</div>
+              <motion.button
+                className="f1i__theme-toggle"
+                type="button"
+                onClick={handleThemeToggleClick}
+                disabled={isThemeTransitioning}
+                aria-label={`Switch to ${isUltraTheme ? 'midnight' : 'ultra'} theme`}
+                title={`Switch to ${isUltraTheme ? 'midnight' : 'ultra'} theme`}
+                whileHover={prefersReducedMotion || isThemeTransitioning ? undefined : { y: -2, scale: 1.02 }}
+                whileTap={prefersReducedMotion || isThemeTransitioning ? undefined : { scale: 0.97 }}
+                transition={prefersReducedMotion ? undefined : { type: 'spring', stiffness: 320, damping: 22 }}
+              >
+                <motion.span
+                  className="topbar__theme-visual f1i__theme-visual"
+                  aria-hidden="true"
+                  animate={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          rotate: isUltraTheme ? 0 : 180,
+                          scale: isUltraTheme ? 1 : 0.96,
+                        }
+                  }
+                  transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+                >
+                  <motion.span
+                    className="topbar__theme-lenis"
+                    animate={
+                      prefersReducedMotion
+                        ? undefined
+                        : {
+                            rotate: isUltraTheme ? 0 : -180,
+                            scale: isUltraTheme ? 1 : 1.08,
+                            opacity: isUltraTheme ? 0.9 : 0.58,
+                          }
+                    }
+                    transition={{ duration: 0.85, ease: [0.22, 0.61, 0.36, 1] }}
+                  >
+                    <span className="icon icon--lenis" />
+                  </motion.span>
+                  <span className="topbar__theme-icon-stack">
+                    <motion.span
+                      className="icon icon--sun"
+                      animate={
+                        prefersReducedMotion
+                          ? undefined
+                          : {
+                              opacity: isUltraTheme ? 1 : 0,
+                              rotate: isUltraTheme ? 0 : -88,
+                              scale: isUltraTheme ? 1 : 0.42,
+                              y: isUltraTheme ? 0 : -3,
+                            }
+                      }
+                      transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
+                    />
+                    <motion.span
+                      className="icon icon--moon"
+                      animate={
+                        prefersReducedMotion
+                          ? undefined
+                          : {
+                              opacity: isUltraTheme ? 0 : 1,
+                              rotate: isUltraTheme ? 88 : 0,
+                              scale: isUltraTheme ? 0.42 : 1,
+                              y: isUltraTheme ? 3 : 0,
+                            }
+                      }
+                      transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
+                    />
+                  </span>
+                </motion.span>
+                <span className="f1i__theme-copy">
+                  <span className="f1i__theme-copy-label">Theme</span>
+                  <span className="f1i__theme-copy-value">
+                    {isThemeTransitioning ? 'Switching' : isUltraTheme ? 'Ultra' : 'Midnight'}
+                  </span>
+                </span>
+              </motion.button>
             </div>
 
             <div className="f1i__hud-group f1i__hud-group--stats">
