@@ -1,403 +1,562 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Lenis from 'lenis'
 import { gsap } from 'gsap'
-import '../../styles/Intro.css'
+import { motion, useReducedMotion } from 'framer-motion'
+import '../../styles/Intro.scss'
 
-// ─── SYSC × F1 Cinematic Intro ───────────────────────────────────────────────
-// Drop-in component. Just pass onEnter={() => setIntroComplete(true)}
-// ─────────────────────────────────────────────────────────────────────────────
-// OPTIONAL AUDIO ENHANCEMENT:
-// To add engine rev sound on countdown "GO!":
-// 1. Save your audio file: /public/audio/engine-rev.mp3 (0.5-1.5s duration)
-// 2. Uncomment the audio playback code below (search for "AUDIO_ENHANCEMENT")
-// 3. Import: import engineRevSfx from '../../../public/audio/engine-rev.mp3'
-// ─────────────────────────────────────────────────────────────────────────────
+const COUNTDOWN_LIGHTS = [0, 1, 2, 3, 4]
 
-const LINE_CONFIGS = Array.from({ length: 20 }, (_, i) => ({
-  height : i % 4 === 0 ? '2.5px' : i % 3 === 0 ? '1.5px' : '1px',
-  width  : `${38 + (i * 3.7) % 44}%`,
-  opacity: 0.25 + (i % 6) * 0.10,
-  top    : `${i * 5 + (i % 3) * 0.6 + 1.2}%`,
-  color  : i % 7 === 0 ? '#E10600' : '#ffffff',
+const SPEED_LINES = Array.from({ length: 18 }, (_, index) => ({
+  id: index,
+  top: `${10 + ((index * 11) % 78)}%`,
+  width: `${28 + ((index * 9) % 38)}%`,
+  opacity: (0.22 + (index % 5) * 0.11).toFixed(2),
+  duration: (0.92 + (index % 6) * 0.14).toFixed(2),
+  delay: (index * 0.04).toFixed(2),
 }))
 
+const TRACK_MARKERS = [
+  { label: 'GRID', left: '18%' },
+  { label: 'SECTOR 1', left: '50%' },
+  { label: 'APEX', left: '80%' },
+]
+
+const SUPPORT_CARDS = [
+  {
+    label: 'Launch Mode',
+    value: 'Pit Wall Focus',
+    copy: 'Fast lanes, tight transitions, and a race-night atmosphere before the app opens.',
+  },
+  {
+    label: 'Telemetry',
+    value: 'GSAP Driven',
+    copy: 'The core sequence is timed as one controlled cinematic pass instead of scattered selectors.',
+  },
+  {
+    label: 'Surface Feel',
+    value: 'Lenis Drift',
+    copy: 'A smooth stage spool adds subtle camera pressure without turning the intro into a janky scroll trap.',
+  },
+]
+
+const pad = (value, size) => String(Math.max(0, Math.round(value))).padStart(size, '0')
+const lenisEase = (value) => 1 - Math.pow(1 - value, 4)
+
 export default function IntroScreen({ onEnter }) {
-  const rootRef     = useRef(null)
-  const enteredRef  = useRef(false)
-  const tlRef       = useRef(null)
-  const rpmRafRef   = useRef(null)
-  const timerRafRef = useRef(null)
+  const wrapperRef = useRef(null)
+  const sceneRef = useRef(null)
+  const rootRef = useRef(null)
+  const enterButtonRef = useRef(null)
+  const speedRef = useRef(null)
+  const rpmRef = useRef(null)
+  const rpmBarRef = useRef(null)
+  const statusRef = useRef(null)
+  const lenisRef = useRef(null)
+  const introTimelineRef = useRef(null)
+  const ambientTimelineRef = useRef(null)
+  const enterTimelineRef = useRef(null)
+  const [isReady, setIsReady] = useState(false)
+  const [isEntering, setIsEntering] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
-  // ── Safe Enter ───────────────────────────────────────────────────────────
-  const safeEnter = () => {
-    if (enteredRef.current) return
-    enteredRef.current = true
-    tlRef.current?.kill()
-    if (rpmRafRef.current)   cancelAnimationFrame(rpmRafRef.current)
-    if (timerRafRef.current) cancelAnimationFrame(timerRafRef.current)
+  const handleEnter = useCallback(() => {
+    if (isEntering) return
 
     const root = rootRef.current
-    if (!root) { onEnter?.(); return }
+    const wrapper = wrapperRef.current
 
-    // Optional: Trigger subtle vibration if supported
-    if (navigator?.vibrate) {
-      navigator.vibrate([10, 5, 10])
+    if (!(root instanceof HTMLElement) || !(wrapper instanceof HTMLElement)) {
+      onEnter?.()
+      return
     }
 
-    // Scan line sweep on exit
-    const scan = root.querySelector('.f1i__scan-line')
-    gsap.fromTo(scan,
-      { top: '0%', autoAlpha: 1 },
-      { top: '100%', duration: 0.4, ease: 'power2.in' }
-    )
+    setIsEntering(true)
+    lenisRef.current?.stop?.()
+    introTimelineRef.current?.kill()
+    ambientTimelineRef.current?.kill()
+    enterTimelineRef.current?.kill()
 
-    // Flash the enter button on click
-    const btn = root.querySelector('.f1i__enter')
-    gsap.to(btn, { opacity: 0.6, duration: 0.12, ease: 'power2.in' })
+    const q = gsap.utils.selector(root)
 
-    gsap.to(root, {
-      yPercent : -105,
-      duration : 0.72,
-      delay    : 0.18,
-      ease     : 'power4.inOut',
-      onComplete: onEnter,
+    enterTimelineRef.current = gsap.timeline({
+      defaults: {
+        ease: prefersReducedMotion ? 'power1.inOut' : 'power4.inOut',
+      },
+      onComplete: () => {
+        onEnter?.()
+      },
     })
-  }
 
-  // ── RPM counter ──────────────────────────────────────────────────────────
-  const animateRpm = (from, to, ms, el) => {
-    if (!el) return
-    const start = performance.now()
-    const barFill = rootRef.current?.querySelector('.f1i__rpm-bar-fill')
-    const tick = (now) => {
-      const t      = Math.min((now - start) / ms, 1)
-      const eased  = 1 - (1 - t) * (1 - t)
-      const val    = Math.round(from + (to - from) * eased)
-      el.textContent = String(val).padStart(4, '0')
-      if (barFill) barFill.style.width = `${(val / 9500) * 100}%`
-      if (t < 1)   rpmRafRef.current = requestAnimationFrame(tick)
-      else         el.textContent = String(to).padStart(4, '0')
-    }
-    rpmRafRef.current = requestAnimationFrame(tick)
-  }
+    enterTimelineRef.current
+      .to(q('.f1i__launch-wash'), {
+        xPercent: 0,
+        opacity: prefersReducedMotion ? 0.45 : 0.92,
+        duration: prefersReducedMotion ? 0.2 : 0.46,
+      }, 0)
+      .to(q('.f1i__cta'), {
+        scale: 0.96,
+        opacity: 0.25,
+        duration: 0.18,
+      }, 0)
+      .to(q('.f1i__hero'), {
+        yPercent: -8,
+        opacity: 0.14,
+        filter: prefersReducedMotion ? 'none' : 'blur(10px)',
+        duration: prefersReducedMotion ? 0.24 : 0.56,
+      }, 0.06)
+      .to(q('.f1i__hud, .f1i__track, .f1i__track-glow, .f1i__speed'), {
+        opacity: 0,
+        duration: prefersReducedMotion ? 0.18 : 0.4,
+      }, 0.1)
+      .to(root, {
+        scale: prefersReducedMotion ? 1.01 : 1.05,
+        autoAlpha: 0,
+        duration: prefersReducedMotion ? 0.28 : 0.72,
+      }, 0.1)
+      .to(wrapper, {
+        backgroundColor: '#040404',
+        duration: 0.2,
+      }, 0)
+  }, [isEntering, onEnter, prefersReducedMotion])
 
-  // ── Telemetry lap timer ──────────────────────────────────────────────────
-  const startTimer = (el) => {
-    if (!el) return
-    const start = performance.now()
-    const tick = (now) => {
-      const ms       = Math.round(now - start)
-      const mins     = String(Math.floor(ms / 60000)).padStart(2, '0')
-      const secs     = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')
-      const centis   = String(Math.floor((ms % 1000) / 10)).padStart(3, '0')
-      el.textContent = `${mins}:${secs}.${centis}`
-      timerRafRef.current = requestAnimationFrame(tick)
-    }
-    timerRafRef.current = requestAnimationFrame(tick)
-  }
-
-  // ── Main Timeline ────────────────────────────────────────────────────────
   useEffect(() => {
-    const root = rootRef.current
-    if (!root) return
+    if (!isReady || isEntering || typeof window === 'undefined') return undefined
 
-    const q = (s) => root.querySelector(s)
-    const qa = (s) => Array.from(root.querySelectorAll(s))
-
-    const flash     = q('.f1i__flash')
-    const lines     = qa('.f1i__speed-line')
-    const rpmEl     = q('.f1i__rpm-value')
-    const rpmWrap   = q('.f1i__rpm')
-    const letters   = qa('.f1i__letter')
-    const stripe    = q('.f1i__stripe')
-    const tagline   = q('.f1i__tagline')
-    const enterBtn  = q('.f1i__enter')
-    const countdown = q('.f1i__countdown')
-    const dots      = qa('.f1i__light')
-    const countNum  = q('.f1i__count-num')
-    const telemetry = q('.f1i__telemetry')
-    const timerEl   = q('.f1i__telemetry-timer')
-    const scanLine  = q('.f1i__scan-line')
-    const corners   = qa('.f1i__corner')
-    const bgGrid    = q('.f1i__bg-grid')
-
-    // ── Initial states ────────────────────────────────────────────────────
-    gsap.set(flash,     { autoAlpha: 0 })
-    gsap.set(lines,     { xPercent: -110 })
-    gsap.set(rpmWrap,   { autoAlpha: 0, y: -8 })
-    gsap.set(letters,   { y: -160, autoAlpha: 0, rotateX: -25 })
-    gsap.set(stripe,    { scaleX: 0, transformOrigin: 'left center', autoAlpha: 0 })
-    gsap.set(tagline,   { autoAlpha: 0, y: 14 })
-    gsap.set(enterBtn,  { autoAlpha: 0, y: 8 })
-    gsap.set(countdown, { autoAlpha: 0 })
-    gsap.set(telemetry, { autoAlpha: 0, y: 12 })
-    gsap.set(scanLine,  { autoAlpha: 0 })
-    gsap.set(corners,   { autoAlpha: 0, scale: 1.4 })
-    gsap.set(bgGrid,    { autoAlpha: 0 })
-
-    // ── Timeline ──────────────────────────────────────────────────────────
-    const tl = gsap.timeline({ paused: true })
-    tlRef.current = tl
-
-    // 1 ── Camera shutter flash ────────────────────────────────────────────
-    tl.set(flash, { autoAlpha: 1 })
-      .to(flash, { autoAlpha: 0, duration: 0.06, ease: 'none' }, '+=0.04')
-      .set(flash, { autoAlpha: 0.7 })
-      .to(flash, { autoAlpha: 0, duration: 0.07, ease: 'none' }, '+=0.03')
-      .set(flash, { autoAlpha: 1 })
-      .to(flash, { autoAlpha: 0, duration: 0.12, ease: 'none' }, '+=0.03')
-
-    // 2 ── BG grid + corners fade in ───────────────────────────────────────
-    tl.to(bgGrid, { autoAlpha: 1, duration: 0.6, ease: 'power2.out' }, '-=0.05')
-    tl.to(corners, {
-      autoAlpha : 1,
-      scale     : 1,
-      duration  : 0.4,
-      stagger   : 0.06,
-      ease      : 'power3.out',
-    }, '<0.1')
-
-    // 3 ── Speed lines shoot across ────────────────────────────────────────
-    tl.to(lines, {
-      xPercent : 130,
-      duration : 0.48,
-      stagger  : 0.022,
-      ease     : 'power3.in',
-    }, '-=0.2')
-
-    // 4 ── RPM counter ─────────────────────────────────────────────────────
-    tl.to(rpmWrap, {
-      autoAlpha : 1,
-      y         : 0,
-      duration  : 0.22,
-      ease      : 'power2.out',
-    }, '-=0.14')
-    tl.add(() => animateRpm(0, 9500, 1050, rpmEl), '<')
-
-    // 5 ── Countdown lights ────────────────────────────────────────────────
-    tl.to(countdown, {
-      autoAlpha : 1,
-      duration  : 0.2,
-      ease      : 'power2.out',
-    }, '+=0.2')
-
-    dots.forEach((dot, i) => {
-      tl.to(dot, {
-        backgroundColor : '#E10600',
-        boxShadow       : '0 0 28px 10px rgba(225,6,0,0.8)',
-        duration        : 0.15,
-        ease            : 'power2.out',
-      }, '+=0.26')
-      if (i === 1) tl.add(() => { if (countNum) countNum.textContent = '3' }, '<0.05')
-      if (i === 2) tl.add(() => { if (countNum) countNum.textContent = '2' }, '<0.05')
-      if (i === 3) tl.add(() => { if (countNum) countNum.textContent = '1' }, '<0.05')
-    })
-
-    // Lights out + GO!
-    tl.to(dots, {
-      backgroundColor : '#1a0000',
-      boxShadow       : 'none',
-      duration        : 0.12,
-      stagger         : 0.035,
-      ease            : 'power4.in',
-    }, '+=0.22')
-    tl.add(() => { if (countNum) countNum.textContent = 'GO!' }, '<0.04')
-
-    // AUDIO_ENHANCEMENT: Uncomment to play engine rev sound on GO!
-    // tl.add(() => {
-    //   const audio = new Audio(engineRevSfx)
-    //   audio.volume = 0.4
-    //   audio.play().catch(() => {})
-    // }, '<0.02')
-
-    // Flash red on GO!
-    tl.set(flash, { autoAlpha: 0.15, background: '#E10600' })
-    tl.to(flash, { autoAlpha: 0, duration: 0.3, ease: 'power2.out' }, '+=0.05')
-    tl.to(countdown, { autoAlpha: 0, y: -28, duration: 0.36, ease: 'power3.in' }, '+=0.28')
-
-    // 6 ── SYSC letters slam ───────────────────────────────────────────────
-    tl.to(letters, {
-      y        : 0,
-      autoAlpha: 1,
-      rotateX  : 0,
-      duration : 0.44,
-      stagger  : 0.09,
-      ease     : 'power4.out',
-    }, '-=0.1')
-
-    // Camera shake when S slams
-    tl.to(root, {
-      keyframes: [
-        { x:  7, y: -3, duration: 0.045 },
-        { x: -5, y:  2, duration: 0.045 },
-        { x:  4, y: -1, duration: 0.04  },
-        { x: -2, y:  1, duration: 0.04  },
-        { x:  0, y:  0, duration: 0.035 },
-      ],
-      ease: 'none',
-    }, '<0.05')
-
-    // 7 ── Red stripe sweeps in ────────────────────────────────────────────
-    tl.to(stripe, {
-      autoAlpha : 1,
-      scaleX    : 1,
-      duration  : 0.38,
-      ease      : 'power4.out',
-    }, '-=0.06')
-
-    // 8 ── Tagline + telemetry ─────────────────────────────────────────────
-    tl.to(tagline, {
-      autoAlpha : 1,
-      y         : 0,
-      duration  : 0.44,
-      ease      : 'power3.out',
-    }, '+=0.04')
-
-    tl.to(telemetry, {
-      autoAlpha : 1,
-      y         : 0,
-      duration  : 0.4,
-      ease      : 'power2.out',
-    }, '<0.12')
-    tl.add(() => startTimer(timerEl), '<')
-
-    // 9 ── Scan line drops once across screen ─────────────────────────────
-    tl.fromTo(scanLine,
-      { autoAlpha: 1, top: '0%' },
-      { top: '100%', duration: 1.1, ease: 'power1.inOut', autoAlpha: 1 },
-      '<'
-    )
-
-    // 10 ── Enter button pulses in ─────────────────────────────────────────
-    tl.to(enterBtn, { autoAlpha: 1, y: 0, duration: 0.3, ease: 'power2.out' }, '+=0.06')
-    tl.to(enterBtn, { scale: 1.06, duration: 0.18, ease: 'power2.out' })
-    tl.to(enterBtn, { scale: 1.00, duration: 0.16, ease: 'power2.in'  })
-    tl.to(enterBtn, { scale: 1.04, duration: 0.16, ease: 'power2.out' })
-    tl.to(enterBtn, { scale: 1.00, duration: 0.16, ease: 'power2.in'  })
-
-    tl.play()
-
-    // Keyboard shortcut
-    const onKey = (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); safeEnter() }
+    const handleKeyDown = (event) => {
+      if (event.repeat) return
+      if (event.key !== 'Enter' && event.key !== ' ') return
+      event.preventDefault()
+      handleEnter()
     }
-    window.addEventListener('keydown', onKey)
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleEnter, isEntering, isReady])
+
+  useEffect(() => {
+    if (!isReady || isEntering) return
+    enterButtonRef.current?.focus()
+  }, [isEntering, isReady])
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    const scene = sceneRef.current
+    const root = rootRef.current
+
+    if (
+      typeof window === 'undefined' ||
+      !(wrapper instanceof HTMLElement) ||
+      !(scene instanceof HTMLElement) ||
+      !(root instanceof HTMLElement)
+    ) {
+      return undefined
+    }
+
+    let cancelled = false
+    let tickerHandler = null
+    let autoScrollCall = null
+    let speedLoop = null
+    let driveTween = null
+    const canUseLenis = !prefersReducedMotion && !window.matchMedia('(pointer: coarse)').matches
+
+    const setSpeed = (value) => {
+      if (speedRef.current) {
+        speedRef.current.textContent = pad(value, 3)
+      }
+    }
+
+    const setRpm = (value) => {
+      if (rpmRef.current) {
+        rpmRef.current.textContent = pad(value, 5)
+      }
+
+      if (rpmBarRef.current) {
+        const progress = Math.min(Math.max(value / 15300, 0), 1)
+        rpmBarRef.current.style.transform = `scaleX(${progress})`
+      }
+    }
+
+    const setStatus = (value) => {
+      if (statusRef.current) {
+        statusRef.current.textContent = value
+      }
+    }
+
+    wrapper.scrollTop = 0
+    root.style.setProperty('--drive-shift', '0px')
+    root.style.setProperty('--drive-progress', '0')
+    setSpeed(0)
+    setRpm(0)
+    setStatus('Telemetry syncing')
+
+    const ctx = gsap.context(() => {
+      const q = gsap.utils.selector(root)
+      const speedState = { value: 0 }
+      const rpmState = { value: 0 }
+
+      gsap.set(root, { autoAlpha: 0 })
+      gsap.set(q('.f1i__launch-wash'), { xPercent: -120, opacity: 0 })
+      gsap.set(q('.f1i__grid'), { opacity: 0, scale: 1.03 })
+      gsap.set(q('.f1i__track, .f1i__track-glow, .f1i__marker, .f1i__speed-line'), { opacity: 0 })
+      gsap.set(q('.f1i__hud-chip, .f1i__hud-pill, .f1i__eyebrow, .f1i__lights, .f1i__status, .f1i__subcopy, .f1i__support-card, .f1i__cta, .f1i__footer'), {
+        opacity: 0,
+        y: 22,
+      })
+      gsap.set(q('.f1i__logo-letter'), {
+        yPercent: 112,
+        rotateX: -84,
+        opacity: 0,
+        transformOrigin: '50% 100%',
+      })
+      gsap.set(q('.f1i__stripe'), {
+        scaleX: 0,
+        opacity: 0,
+        transformOrigin: '0% 50%',
+      })
+      gsap.set(q('.f1i__light'), {
+        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        boxShadow: '0 0 0 0 rgba(225, 6, 0, 0)',
+        scale: 0.84,
+      })
+
+      ambientTimelineRef.current = gsap.timeline({
+        paused: prefersReducedMotion,
+        repeat: -1,
+        yoyo: true,
+      })
+
+      ambientTimelineRef.current
+        .to(q('.f1i__halo'), {
+          xPercent: 8,
+          yPercent: -5,
+          scale: 1.06,
+          duration: 3.6,
+          ease: 'sine.inOut',
+        }, 0)
+        .to(q('.f1i__track'), {
+          yPercent: -3,
+          duration: 3.6,
+          ease: 'sine.inOut',
+        }, 0)
+        .to(q('.f1i__grid'), {
+          yPercent: -2,
+          duration: 3.6,
+          ease: 'sine.inOut',
+        }, 0)
+
+      introTimelineRef.current = gsap.timeline({
+        defaults: {
+          ease: prefersReducedMotion ? 'power1.out' : 'expo.out',
+        },
+        onComplete: () => {
+          if (cancelled) return
+          setStatus('Press Enter to launch SYSC')
+          setIsReady(true)
+        },
+      })
+
+      introTimelineRef.current
+        .to(root, {
+          autoAlpha: 1,
+          duration: 0.26,
+        }, 0)
+        .fromTo(q('.f1i__noise, .f1i__scanlines, .f1i__vignette'), {
+          opacity: 0,
+        }, {
+          opacity: 1,
+          duration: 0.28,
+          stagger: 0.05,
+        }, 0)
+        .to(q('.f1i__grid'), {
+          opacity: 0.86,
+          scale: 1,
+          duration: 0.62,
+        }, 0.08)
+        .to(q('.f1i__track, .f1i__track-glow, .f1i__marker'), {
+          opacity: 1,
+          duration: 0.56,
+          stagger: 0.06,
+        }, 0.16)
+        .fromTo(q('.f1i__speed-line'), {
+          xPercent: -180,
+          opacity: 0,
+        }, {
+          xPercent: 0,
+          opacity: (_, target) => Number(target.dataset.opacity) || 0.42,
+          duration: 0.56,
+          stagger: {
+            each: 0.035,
+            from: 'random',
+          },
+          ease: 'power3.out',
+        }, 0.24)
+        .to(q('.f1i__hud-chip, .f1i__hud-pill'), {
+          opacity: 1,
+          y: 0,
+          duration: 0.32,
+          stagger: 0.06,
+        }, 0.28)
+        .to(speedState, {
+          value: 328,
+          duration: prefersReducedMotion ? 0.28 : 1.18,
+          ease: 'power3.out',
+          onUpdate: () => setSpeed(speedState.value),
+        }, 0.34)
+        .to(rpmState, {
+          value: 15300,
+          duration: prefersReducedMotion ? 0.34 : 1.28,
+          ease: 'power3.out',
+          onUpdate: () => setRpm(rpmState.value),
+        }, 0.38)
+        .to(q('.f1i__eyebrow, .f1i__lights, .f1i__status'), {
+          opacity: 1,
+          y: 0,
+          duration: 0.34,
+          stagger: 0.05,
+        }, 0.48)
+        .call(() => setStatus('Grid lights armed'), null, 0.7)
+        .to(q('.f1i__light'), {
+          backgroundColor: 'rgba(225, 6, 0, 0.98)',
+          boxShadow: '0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 22px rgba(225, 6, 0, 0.7)',
+          scale: 1,
+          duration: 0.12,
+          stagger: 0.13,
+          ease: 'power2.out',
+        }, 0.82)
+        .call(() => setStatus('Lights out, push for the apex'), null, 1.46)
+        .fromTo(q('.f1i__logo-letter'), {
+          yPercent: 112,
+          rotateX: -84,
+          opacity: 0,
+        }, {
+          yPercent: 0,
+          rotateX: 0,
+          opacity: 1,
+          duration: prefersReducedMotion ? 0.28 : 0.58,
+          stagger: 0.08,
+          ease: 'back.out(1.6)',
+        }, 1.32)
+        .to(root, {
+          x: 6,
+          duration: 0.05,
+          repeat: 5,
+          yoyo: true,
+          ease: 'power1.inOut',
+          clearProps: 'x',
+        }, 1.42)
+        .to(q('.f1i__stripe'), {
+          scaleX: 1,
+          opacity: 1,
+          duration: 0.34,
+        }, 1.64)
+        .to(q('.f1i__subcopy, .f1i__support-card'), {
+          opacity: 1,
+          y: 0,
+          duration: 0.36,
+          stagger: 0.08,
+        }, 1.78)
+        .to(q('.f1i__cta, .f1i__footer'), {
+          opacity: 1,
+          y: 0,
+          duration: 0.32,
+          stagger: 0.06,
+        }, 2.02)
+        .call(() => {
+          if (prefersReducedMotion) return
+
+          speedLoop = gsap.to(q('.f1i__speed-line'), {
+            xPercent: 170,
+            duration: (_, target) => Number(target.dataset.duration) || 1.2,
+            delay: (_, target) => Number(target.dataset.delay) || 0,
+            ease: 'none',
+            stagger: {
+              each: 0.05,
+              repeat: -1,
+            },
+            repeat: -1,
+          })
+        }, null, 1.02)
+    }, root)
+
+    if (canUseLenis) {
+      const lenis = new Lenis({
+        wrapper,
+        content: scene,
+        autoRaf: false,
+        smoothWheel: true,
+        syncTouch: false,
+        allowNestedScroll: true,
+        lerp: 0.085,
+        wheelMultiplier: 0.9,
+      })
+
+      const updateDrive = ({ scroll, limit, progress }) => {
+        const safeLimit = Math.max(limit || 1, 1)
+        const driveShift = Math.min(scroll * 0.8, 140)
+        root.style.setProperty('--drive-shift', `${driveShift}px`)
+        root.style.setProperty('--drive-progress', String(progress ?? scroll / safeLimit))
+      }
+
+      lenis.on('scroll', updateDrive)
+      lenisRef.current = lenis
+      tickerHandler = (time) => lenis.raf(time * 1000)
+      gsap.ticker.add(tickerHandler)
+
+      const targetScroll = Math.min(Math.max(wrapper.scrollHeight - wrapper.clientHeight, 0), 180)
+      if (targetScroll > 0) {
+        autoScrollCall = gsap.delayedCall(0.18, () => {
+          lenis.scrollTo(targetScroll, {
+            duration: 1.7,
+            easing: lenisEase,
+          })
+        })
+      }
+    } else {
+      driveTween = gsap.to(root, {
+        '--drive-shift': prefersReducedMotion ? '36px' : '84px',
+        '--drive-progress': prefersReducedMotion ? 0.22 : 0.58,
+        duration: prefersReducedMotion ? 0.34 : 1.8,
+        ease: 'power2.out',
+      })
+    }
 
     return () => {
-      tl.kill()
-      if (rpmRafRef.current)   cancelAnimationFrame(rpmRafRef.current)
-      if (timerRafRef.current) cancelAnimationFrame(timerRafRef.current)
-      window.removeEventListener('keydown', onKey)
+      cancelled = true
+      speedLoop?.kill()
+      autoScrollCall?.kill()
+      driveTween?.kill()
+      enterTimelineRef.current?.kill()
+      introTimelineRef.current?.kill()
+      ambientTimelineRef.current?.kill()
+
+      if (tickerHandler) {
+        gsap.ticker.remove(tickerHandler)
+      }
+
+      lenisRef.current?.destroy()
+      lenisRef.current = null
+      ctx.revert()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [prefersReducedMotion])
 
-  // ── JSX ──────────────────────────────────────────────────────────────────
   return (
-    <div className="f1i" ref={rootRef} role="region" aria-label="SYSC Intro">
+    <div className="f1i" ref={wrapperRef} aria-label="SYSC F1 intro screen">
+      <div className="f1i__scene" ref={sceneRef}>
+        <section className="f1i__stage" ref={rootRef}>
+          <div className="f1i__noise" aria-hidden="true" />
+          <div className="f1i__scanlines" aria-hidden="true" />
+          <div className="f1i__vignette" aria-hidden="true" />
+          <div className="f1i__halo" aria-hidden="true" />
+          <div className="f1i__grid" aria-hidden="true" />
+          <div className="f1i__launch-wash" aria-hidden="true" />
 
-      {/* Overlays */}
-      <div className="f1i__flash"     aria-hidden="true" />
-      <div className="f1i__grain"     aria-hidden="true" />
-      <div className="f1i__scanlines" aria-hidden="true" />
-      <div className="f1i__vignette"  aria-hidden="true" />
-      <div className="f1i__bg-grid"   aria-hidden="true" />
-      <div className="f1i__scan-line" aria-hidden="true" />
+          <div className="f1i__track" aria-hidden="true" />
+          <div className="f1i__track-glow" aria-hidden="true" />
 
-      {/* Viewfinder corners */}
-      <div className="f1i__corner f1i__corner--tl" aria-hidden="true" />
-      <div className="f1i__corner f1i__corner--tr" aria-hidden="true" />
-      <div className="f1i__corner f1i__corner--bl" aria-hidden="true" />
-      <div className="f1i__corner f1i__corner--br" aria-hidden="true" />
-
-      {/* ● REC — top left */}
-      <div className="f1i__rec" aria-label="Recording indicator">
-        <span className="f1i__rec-dot" aria-hidden="true" />
-        <span className="f1i__rec-label">REC</span>
-      </div>
-
-      {/* RPM — top right */}
-      <div className="f1i__rpm" aria-live="polite" aria-label="RPM">
-        <span className="f1i__rpm-label">RPM</span>
-        <span className="f1i__rpm-value">0000</span>
-        <div className="f1i__rpm-bar-track" aria-hidden="true">
-          <div className="f1i__rpm-bar-fill" />
-        </div>
-      </div>
-
-      {/* Speed lines */}
-      <div className="f1i__speed-lines" aria-hidden="true">
-        {LINE_CONFIGS.map(({ height, width, opacity, top, color }, i) => (
-          <div
-            key={i}
-            className="f1i__speed-line"
-            style={{ height, width, opacity, top, '--line-color': color }}
-          />
-        ))}
-      </div>
-
-      {/* Countdown */}
-      <div className="f1i__countdown" aria-live="polite" aria-label="Race start">
-        <div className="f1i__lights-row" aria-hidden="true">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="f1i__light">
-              <div className="f1i__light-inner" />
-            </div>
+          {TRACK_MARKERS.map((marker) => (
+            <span
+              key={marker.label}
+              className="f1i__marker"
+              style={{ left: marker.left }}
+              aria-hidden="true"
+            >
+              {marker.label}
+            </span>
           ))}
-        </div>
-        <div className="f1i__count-num" aria-atomic="true">3</div>
-      </div>
 
-      {/* Main Stage */}
-      <div className="f1i__stage">
-
-        {/* SYSC Logo */}
-        <div className="f1i__logo-wrap">
-          <div className="f1i__logo-pre" aria-hidden="true">MUSIC PLATFORM</div>
-          <h1 className="f1i__logo" aria-label="SYSC">
-            {['S', 'Y', 'S', 'C'].map((ch, i) => (
-              <span key={i} className="f1i__letter" aria-hidden="true">{ch}</span>
+          <div className="f1i__speed" aria-hidden="true">
+            {SPEED_LINES.map((line) => (
+              <span
+                key={line.id}
+                className="f1i__speed-line"
+                data-delay={line.delay}
+                data-duration={line.duration}
+                data-opacity={line.opacity}
+                style={{
+                  top: line.top,
+                  width: line.width,
+                }}
+              />
             ))}
-          </h1>
-        </div>
+          </div>
 
-        {/* Red stripe */}
-        <div className="f1i__stripe" aria-hidden="true">
-          <div className="f1i__stripe-glow" />
-        </div>
+          <header className="f1i__hud">
+            <div className="f1i__hud-group">
+              <div className="f1i__hud-chip">
+                <span className="f1i__hud-dot" aria-hidden="true" />
+                REC LIVE
+              </div>
+              <div className="f1i__hud-chip">LAP 01 / NIGHT RUN</div>
+            </div>
 
-        {/* Tagline */}
-        <p className="f1i__tagline">WHERE MUSIC HITS DIFFERENT</p>
+            <div className="f1i__hud-group f1i__hud-group--stats">
+              <div className="f1i__hud-pill">
+                <span className="f1i__hud-label">KM/H</span>
+                <span className="f1i__hud-value" ref={speedRef}>000</span>
+              </div>
+              <div className="f1i__hud-pill f1i__hud-pill--rpm">
+                <span className="f1i__hud-label">RPM</span>
+                <span className="f1i__hud-value" ref={rpmRef}>00000</span>
+                <span className="f1i__rpm-bar" aria-hidden="true">
+                  <span className="f1i__rpm-fill" ref={rpmBarRef} />
+                </span>
+              </div>
+            </div>
+          </header>
 
-        {/* Enter */}
-        <button
-          className="f1i__enter"
-          type="button"
-          onClick={safeEnter}
-          aria-label="Enter SYSC Music Platform"
-        >
-          <span className="f1i__enter-fill" aria-hidden="true" />
-          <span className="f1i__enter-text">ENTER THE ZONE</span>
-          <span className="f1i__enter-arrow" aria-hidden="true">→</span>
-        </button>
+          <div className="f1i__hero">
+            <p className="f1i__eyebrow">Race Control // audio telemetry online</p>
 
-        <p className="f1i__hint" aria-label="Keyboard shortcut">
-          PRESS <kbd>SPACE</kbd> OR <kbd>ENTER</kbd>
-        </p>
+            <div className="f1i__lights" aria-hidden="true">
+              {COUNTDOWN_LIGHTS.map((index) => (
+                <span key={index} className="f1i__light" />
+              ))}
+            </div>
+
+            <p
+              className="f1i__status"
+              ref={statusRef}
+              aria-live="polite"
+            >
+              Telemetry syncing
+            </p>
+
+            <h1 className="f1i__logo" aria-label="SYSC" id="intro-title">
+              {['S', 'Y', 'S', 'C'].map((letter, index) => (
+                <span key={`${letter}-${index}`} className="f1i__logo-letter" aria-hidden="true">
+                  {letter}
+                </span>
+              ))}
+            </h1>
+
+            <div className="f1i__stripe" aria-hidden="true" />
+
+            <p className="f1i__subcopy">
+              Chase The Beat.
+            </p>
+
+            <motion.button
+              ref={enterButtonRef}
+              type="button"
+              className="f1i__cta"
+              onClick={handleEnter}
+              disabled={!isReady || isEntering}
+              whileHover={prefersReducedMotion || !isReady ? undefined : { scale: 1.03, y: -2 }}
+              whileTap={prefersReducedMotion || !isReady ? undefined : { scale: 0.98 }}
+              transition={{ duration: 0.18 }}
+            >
+              <span className="f1i__cta-label">
+                {isEntering ? 'Launching' : isReady ? 'Enter The Grid' : 'Building Grid'}
+              </span>
+              <span className="f1i__cta-arrow" aria-hidden="true">
+                →
+              </span>
+            </motion.button>
+
+            <p className="f1i__footer">Press Enter or Space // lights out when you are ready</p>
+          </div>
+        </section>
       </div>
-
-      {/* Telemetry bar — bottom */}
-      <div className="f1i__telemetry" aria-hidden="true">
-        <span className="f1i__tele-item">LAP <strong>01</strong></span>
-        <span className="f1i__tele-sep">|</span>
-        <span className="f1i__tele-item">SECTOR <strong>02</strong></span>
-        <span className="f1i__tele-sep">|</span>
-        <span className="f1i__tele-timer f1i__telemetry-timer">00:00.000</span>
-        <span className="f1i__tele-sep">|</span>
-        <span className="f1i__tele-item f1i__tele-pos">P<strong>1</strong></span>
-        <span className="f1i__tele-sep">|</span>
-        <span className="f1i__tele-item">SYSC MUSIC <strong>v2.0</strong></span>
-      </div>
-
     </div>
   )
 }
