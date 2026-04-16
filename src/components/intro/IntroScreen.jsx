@@ -240,13 +240,6 @@ export default function IntroScreen({
       })
 
       ambientTimelineRef.current
-        .to(q('.f1i__halo'), {
-          xPercent: 8,
-          yPercent: -5,
-          scale: 1.06,
-          duration: 3.6,
-          ease: 'sine.inOut',
-        }, 0)
         .to(q('.f1i__track'), {
           yPercent: -3,
           duration: 3.6,
@@ -460,7 +453,6 @@ export default function IntroScreen({
           <div className="f1i__noise" aria-hidden="true" />
           <div className="f1i__scanlines" aria-hidden="true" />
           <div className="f1i__vignette" aria-hidden="true" />
-          <div className="f1i__halo" aria-hidden="true" />
           <div className="f1i__grid" aria-hidden="true" />
           <div className="f1i__launch-wash" aria-hidden="true" />
 
