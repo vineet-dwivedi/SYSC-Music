@@ -139,12 +139,9 @@ function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || session) return
-    if (isAuthPath(window.location.pathname)) {
-      setAuthMode(getAuthModeFromPathname(window.location.pathname))
-      return
-    }
+    if (isAuthPath(window.location.pathname)) return
     window.history.replaceState({ page: 'login' }, '', LOGIN_PATH)
-    setAuthMode('login')
+    window.dispatchEvent(new PopStateEvent('popstate'))
   }, [session])
 
   const handleModeChange = useCallback((nextMode) => {
@@ -217,6 +214,7 @@ function App() {
   if (!session) {
     return (
       <AuthPage
+        key={authMode}
         mode={authMode}
         onModeChange={handleModeChange}
         onAuthenticated={handleAuthenticated}

@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import User from '../models/user.model.js';
 
 const sanitizeName = (value) => {
@@ -22,6 +23,16 @@ const toClientUser = (user) => ({
   mobileVerified: Boolean(user.mobileVerified),
 });
 
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePassword = (password) => {
+  // Password must be at least 8 characters, contain uppercase, lowercase, and number
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return passwordRegex.test(password);
+};
 
 const loginWithGoogle = async (req, res) => {
   try {
@@ -108,6 +119,103 @@ const loginWithGoogle = async (req, res) => {
   }
 };
 
+const loginWithEmail = async (req, res) => {
+  try {
+    const email = String(req.body?.email ?? '').trim().toLowerCase();
+    const password = String(req.body?.password ?? '').trim();
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return res.status(404).json({ message: 'This email is not registered. Please register first.' });
+    }
+
+    if (user.authProvider === 'google') {
+      return res.status(400).json({ message: 'This account uses Google authentication. Please use Google Sign-In.' });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({ message: 'Password not set for this account' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const token = createSessionToken();
+    return res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: toClientUser(user),
+    });
+  } catch (err) {
+    console.error('Email login error:', err);
+    return res.status(500).json({ message: 'An error occurred during login' });
+  }
+};
+
+const registerWithEmail = async (req, res) => {
+  try {
+    const email = String(req.body?.email ?? '').trim().toLowerCase();
+    const password = String(req.body?.password ?? '').trim();
+    const confirmPassword = String(req.body?.confirmPassword ?? '').trim();
+    const name = sanitizeName(req.body?.name);
+
+    if (!email || !password || !confirmPassword || !name) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match' });
+    }
+
+    if (!validatePassword(password)) {
+      return res.status(400).json({
+        message: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'This email is already registered. Please login.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      email,
+      name,
+      password: hashedPassword,
+      authProvider: 'email',
+      avatarUrl: '',
+      mobileVerified: false,
+    });
+
+    const token = createSessionToken();
+    return res.status(201).json({
+      message: 'Registration successful',
+      token,
+      user: toClientUser(user),
+    });
+  } catch (err) {
+    console.error('Email registration error:', err);
+    return res.status(500).json({ message: 'An error occurred during registration' });
+  }
+};
+
 export {
   loginWithGoogle,
+  loginWithEmail,
+  registerWithEmail,
 };

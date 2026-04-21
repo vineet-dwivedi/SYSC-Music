@@ -293,15 +293,25 @@
 
 .auth-social__google-shell {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: min(100%, 340px);
   min-height: 54px;
   padding: 6px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(122, 252, 255, 0.14), rgba(255, 156, 209, 0.14));
-  animation: authSocialPulse 3.1s ease-in-out infinite;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+.auth-social__google-shell.is-ready {
+  animation: none;
 }
 
 .auth-social__google {
+  position: relative;
+  z-index: 1;
   width: 100%;
   min-height: 42px;
   display: flex;
@@ -427,6 +437,135 @@
   50% {
     box-shadow: 0 0 0 10px rgba(122, 252, 255, 0);
   }
+}
+
+// Auth method selector
+.auth-method-selector {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.auth-method-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid rgba(122, 252, 255, 0.24);
+  border-radius: 12px;
+  background: rgba(122, 252, 255, 0.06);
+  color: rgba(217, 233, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(122, 252, 255, 0.12);
+    border-color: rgba(122, 252, 255, 0.4);
+  }
+
+  &.is-active {
+    background: linear-gradient(135deg, rgba(122, 252, 255, 0.24), rgba(255, 156, 209, 0.16));
+    border-color: rgba(122, 252, 255, 0.6);
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 12px rgba(122, 252, 255, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+// Email auth form
+.auth-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.auth-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(217, 233, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-form-input {
+  padding: 12px 14px;
+  border: 1px solid rgba(122, 252, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: rgba(217, 233, 255, 0.5);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(122, 252, 255, 0.6);
+    background: rgba(122, 252, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(122, 252, 255, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 1000px rgba(16, 26, 38, 0.95) inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+}
+
+.auth-form-submit {
+  margin-top: 6px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(122, 252, 255, 0.3), rgba(255, 156, 209, 0.2));
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 46px;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(122, 252, 255, 0.4), rgba(255, 156, 209, 0.3));
+    box-shadow: 0 8px 20px rgba(122, 252, 255, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.auth-email-form__hint {
+  margin: -2px 2px 2px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(217, 233, 255, 0.72);
 }
 
 @media (prefers-reduced-motion: reduce) {

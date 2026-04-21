@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    password: {
+      type: String,
+      trim: true,
+      select: false, // Don't include password by default in queries
+    },
     mobile: {
       type: String,
       trim: true,
@@ -35,7 +40,7 @@ const userSchema = new mongoose.Schema(
     },
     authProvider: {
       type: String,
-      enum: ['google', 'mobile'],
+      enum: ['google', 'email', 'mobile'],
       required: true,
     },
     mobileVerified: {
